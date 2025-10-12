@@ -1,0 +1,281 @@
+/* Styles for information panels */
+
+.panel {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.panel-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 12px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+/* Grid Status Panel */
+.grid-status-panel {
+  min-width: 280px;
+}
+
+.status-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.status-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.status-label {
+  font-size: 11px;
+  color: #6b7280;
+  text-transform: uppercase;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.status-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.happiness-value {
+  font-weight: 700;
+}
+
+/* Component Details Panel */
+.details-panel {
+  min-width: 280px;
+}
+
+.empty-state {
+  color: #9ca3af;
+  font-size: 13px;
+  text-align: center;
+  padding: 20px 0;
+}
+
+.details-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-heading {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  padding: 4px 0;
+}
+
+.detail-label {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.detail-value {
+  color: #1f2937;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+/* Time Control Panel */
+.time-control-panel {
+  min-width: 280px;
+}
+
+/* Header variant of time control panel */
+.time-control-header {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  min-width: auto;
+}
+
+.time-control-header .time-display {
+  margin-bottom: 0;
+  gap: 6px;
+}
+
+.time-control-header .current-time {
+  color: white;
+  font-size: 13px;
+}
+
+.time-control-header .season-badge {
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
+  font-size: 11px;
+  padding: 3px 10px;
+}
+
+.time-control-header .control-buttons {
+  margin-bottom: 0;
+  gap: 6px;
+}
+
+.time-control-header .control-btn {
+  padding: 6px 12px;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.time-control-header .speed-controls {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.time-control-header .speed-label {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 11px;
+  margin: 0;
+}
+
+.time-control-header .speed-buttons {
+  gap: 4px;
+  display: flex;
+}
+
+.time-control-header .speed-btn {
+  padding: 4px 10px;
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.time-display {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.current-time {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.season-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background: #dbeafe;
+  color: #1e40af;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+  width: fit-content;
+}
+
+.control-buttons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.control-btn {
+  flex: 1;
+  padding: 8px 16px;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: not-allowed;
+  transition: background 0.2s;
+}
+
+.control-btn:not(:disabled) {
+  cursor: pointer;
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.control-btn:not(:disabled):hover {
+  background: #2563eb;
+}
+
+.speed-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.speed-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+}
+
+.speed-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.speed-btn {
+  padding: 6px;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: not-allowed;
+  transition: all 0.2s;
+}
+
+.speed-btn:not(:disabled) {
+  cursor: pointer;
+}
+
+.speed-btn:not(:disabled):hover {
+  background: #e5e7eb;
+}
+
+.speed-btn.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.phase-note {
+  margin-top: 12px;
+  font-size: 11px;
+  color: #9ca3af;
+  font-style: italic;
+  text-align: center;
+}

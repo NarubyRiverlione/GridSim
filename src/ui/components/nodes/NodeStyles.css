@@ -1,0 +1,84 @@
+/* Styles for custom React Flow nodes */
+
+.custom-node {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: white;
+  border: 2px solid;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  min-width: 180px;
+  transition: all 0.2s ease;
+}
+
+.custom-node:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.custom-node.selected {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+}
+
+.node-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.city-icon {
+  border-radius: 50%;
+}
+
+.icon-text {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+.node-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.node-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: #1f2937;
+  text-transform: capitalize;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.node-info {
+  font-size: 11px;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.node-warning {
+  font-size: 11px;
+  color: #ef4444;
+  font-weight: 500;
+}
+
+/* React Flow handle customization */
+.react-flow__handle {
+  width: 8px;
+  height: 8px;
+  background: #3b82f6;
+  border: 2px solid white;
+}
+
+.react-flow__handle:hover {
+  background: #2563eb;
+}

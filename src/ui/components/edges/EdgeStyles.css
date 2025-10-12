@@ -1,0 +1,37 @@
+/* Styles for custom React Flow edges */
+
+.edge-label {
+  font-size: 11px;
+  pointer-events: all;
+}
+
+.edge-label-content {
+  background: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 2px solid;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.edge-label-line {
+  font-weight: 600;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.react-flow__edge-path {
+  stroke-width: 3;
+  transition: stroke 0.2s ease;
+}
+
+.react-flow__edge-path:hover {
+  stroke-width: 5;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke-width: 5;
+}
