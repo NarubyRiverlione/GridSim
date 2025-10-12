@@ -122,10 +122,15 @@ pnpm preview
   - Add Substation
   - Add Switching Station
 - **Information Panels**:
-  - Grid Status (budget, happiness, generation, demand)
-  - Component Details (selected component info)
-  - Time Control (placeholder for Phase 1)
-- **Visual Polish**: Clean UI with color coding and smooth animations
+  - Grid Status (budget, happiness, generation, demand) - displayed in canvas footer
+  - Component Details (selected component info) - in left sidebar
+  - Time Control (in header with glassmorphism styling)
+- **UI Layout**:
+  - Header with title and time controls
+  - Left sidebar with mode switcher and component details
+  - Central canvas area with React Flow
+  - Canvas footer with 8 grid status metrics in single row
+- **Visual Polish**: Clean UI with color coding, smooth animations, and glassmorphism effects
 
 ### Mock Data
 
@@ -162,9 +167,9 @@ Main canvas component using React Flow for rendering the electrical grid as a no
 
 ### Information Panels
 
-- **GridStatusPanel**: Overview of grid metrics (generation, demand, budget, happiness)
-- **ComponentDetailsPanel**: Detailed information for selected components
-- **TimeControlPanel**: Placeholder for time simulation controls (Phase 1)
+- **GridStatusPanel**: Overview of 8 grid metrics displayed in canvas footer (generation, demand, budget, happiness, price, utilization, cities powered, uptime)
+- **ComponentDetailsPanel**: Detailed information for selected components, shown in left sidebar below mode switcher
+- **TimeControlPanel**: Time display and controls in header with glassmorphism styling (play/pause/speed controls placeholder for Phase 1)
 
 **Location**: `src/ui/components/panels/`
 
