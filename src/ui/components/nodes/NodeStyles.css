@@ -71,6 +71,17 @@
   font-weight: 500;
 }
 
+/* Pylon-specific styles */
+.pylon-node {
+  min-width: 120px;
+}
+
+.pylon-node .node-icon {
+  width: 30px;
+  height: 30px;
+  font-size: 16px;
+}
+
 /* React Flow handle customization */
 .react-flow__handle {
   width: 8px;

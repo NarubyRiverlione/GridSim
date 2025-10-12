@@ -7,11 +7,13 @@ import {
   ComponentState,
   PlantType,
   Season,
+  SubstationType,
   VoltageLevel,
   type City,
   type GameMetrics,
   type GridState,
   type PowerPlant,
+  type Pylon,
   type Substation,
   type SwitchingStation,
   type TransmissionLine,
@@ -144,6 +146,7 @@ export const mockSubstations: Substation[] = [
   {
     id: 'substation-1',
     location: { x: 300, y: 250 },
+    substationType: SubstationType.Grid,
     voltageIn: VoltageLevel.KV400,
     voltageOut: VoltageLevel.KV220,
     capacity: 2000,
@@ -152,6 +155,21 @@ export const mockSubstations: Substation[] = [
     breakers: [
       { id: 'breaker-1', closed: true, tripped: false },
       { id: 'breaker-2', closed: true, tripped: false },
+    ],
+    state: ComponentState.Healthy,
+  },
+  {
+    id: 'substation-2',
+    location: { x: 550, y: 200 },
+    substationType: SubstationType.Zone,
+    voltageIn: VoltageLevel.KV220,
+    voltageOut: VoltageLevel.KV110,
+    capacity: 800,
+    currentLoad: 650,
+    losses: 1.2,
+    breakers: [
+      { id: 'breaker-3', closed: true, tripped: false },
+      { id: 'breaker-4', closed: true, tripped: false },
     ],
     state: ComponentState.Healthy,
   },
@@ -167,6 +185,33 @@ export const mockSwitchingStations: SwitchingStation[] = [
       { id: 'breaker-sw-3', closed: false, tripped: false },
     ],
     connectedLines: ['line-4', 'line-5', 'line-6'],
+    state: ComponentState.Healthy,
+  },
+]
+
+export const mockPylons: Pylon[] = [
+  {
+    id: 'pylon-1',
+    location: { x: 200, y: 225 },
+    maxLines: 4,
+    connectedLines: ['line-1'],
+    voltageLevel: VoltageLevel.KV400,
+    state: ComponentState.Healthy,
+  },
+  {
+    id: 'pylon-2',
+    location: { x: 350, y: 350 },
+    maxLines: 4,
+    connectedLines: ['line-7', 'line-8'],
+    voltageLevel: VoltageLevel.KV220,
+    state: ComponentState.Healthy,
+  },
+  {
+    id: 'pylon-3',
+    location: { x: 700, y: 250 },
+    maxLines: 4,
+    connectedLines: ['line-9', 'line-10', 'line-11'],
+    voltageLevel: VoltageLevel.KV110,
     state: ComponentState.Healthy,
   },
 ]

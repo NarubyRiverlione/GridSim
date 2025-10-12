@@ -3,7 +3,7 @@
  */
 
 import React from 'react'
-import type { Component, TransmissionLine, City, PowerPlant, Substation, SwitchingStation } from '@/types'
+import type { Component, TransmissionLine, City, PowerPlant, Substation, SwitchingStation, Pylon } from '@/types'
 import './PanelStyles.css'
 
 interface ComponentDetailsPanelProps {
@@ -49,8 +49,13 @@ const renderComponentDetails = (component: Component | TransmissionLine): React.
     return renderSubstationDetails(component)
   }
 
-  // Otherwise it's a switching station
-  if ('connectedLines' in component) {
+  // Check if it's a pylon (has 'maxLines')
+  if ('maxLines' in component) {
+    return renderPylonDetails(component)
+  }
+
+  // Check if it's a switching station (has 'breakers')
+  if ('breakers' in component) {
     return renderSwitchingStationDetails(component)
   }
 
@@ -120,6 +125,21 @@ const renderSwitchingStationDetails = (station: SwitchingStation): React.ReactEl
       <DetailRow label="Total Breakers" value={`${station.breakers.length}`} />
       <DetailRow label="Closed Breakers" value={`${closedBreakers}`} />
       <DetailRow label="State" value={station.state} />
+    </div>
+  )
+}
+
+const renderPylonDetails = (pylon: Pylon): React.ReactElement => {
+  const utilization = Math.round((pylon.connectedLines.length / pylon.maxLines) * 100)
+
+  return (
+    <div className="detail-section">
+      <h3 className="detail-heading">Pylon</h3>
+      <DetailRow label="Max Lines" value={`${pylon.maxLines}`} />
+      <DetailRow label="Connected Lines" value={`${pylon.connectedLines.length}`} />
+      <DetailRow label="Utilization" value={`${utilization}%`} />
+      {pylon.voltageLevel !== undefined && <DetailRow label="Voltage" value={`${pylon.voltageLevel} kV`} />}
+      <DetailRow label="State" value={pylon.state} />
     </div>
   )
 }

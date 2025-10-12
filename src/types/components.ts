@@ -2,7 +2,7 @@
  * Component type definitions for all grid elements
  */
 
-import type { CitySize, ComponentState, PlantType, VoltageLevel } from './enums'
+import type { CitySize, ComponentState, PlantType, SubstationType, VoltageLevel } from './enums'
 import type { NodeId, Point } from './grid'
 
 export interface BaseComponent {
@@ -44,6 +44,7 @@ export interface TransmissionLine {
 }
 
 export interface Substation extends BaseComponent {
+  substationType: SubstationType
   voltageIn: VoltageLevel
   voltageOut: VoltageLevel
   capacity: number
@@ -55,6 +56,12 @@ export interface Substation extends BaseComponent {
 export interface SwitchingStation extends BaseComponent {
   breakers: Breaker[]
   connectedLines: string[]
+}
+
+export interface Pylon extends BaseComponent {
+  maxLines: number
+  connectedLines: string[]
+  voltageLevel?: VoltageLevel
 }
 
 export interface Breaker {
@@ -69,4 +76,4 @@ export interface DemandProfile {
   profileType: 'residential' | 'industrial' | 'commercial' | 'mixed'
 }
 
-export type Component = PowerPlant | City | Substation | SwitchingStation
+export type Component = PowerPlant | City | Substation | SwitchingStation | Pylon

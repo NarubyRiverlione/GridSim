@@ -108,12 +108,15 @@ pnpm preview
 - **Project Setup**: Vite + React + TypeScript with pnpm
 - **Code Quality**: ESLint, Prettier, Vitest, pre-commit hooks
 - **Canvas Integration**: React Flow with zoom and pan controls
+- **UI Polish**: Snap-to-grid (50px) and collision detection for clean component placement
 - **Custom Node Types**:
-  - Power Plants (Nuclear, Coal, CCGT, Hydro, Wind, Solar)
-  - Cities (with demand display)
-  - Substations (voltage transformation)
-  - Switching Stations (breaker control)
-- **Custom Edge Type**: Transmission Lines (with voltage and load display)
+  - Power Plants (Nuclear, Coal, CCGT, Hydro, Wind, Solar) - 400kV output
+  - Cities (with demand display, multi-connection support) - 110kV input
+  - Grid Substations (400→220kV transformation)
+  - Zone Substations (220→110kV transformation)
+  - Switching Stations (breaker control, same-voltage routing)
+  - Pylons (structural support for long-distance lines, 4-line capacity)
+- **Custom Edge Type**: Transmission Lines (400kV/220kV/110kV with voltage-based visual styling)
 - **Interaction Modes**:
   - Select/Pan (default)
   - Add Power Plant
@@ -122,20 +125,32 @@ pnpm preview
   - Add Substation
   - Add Switching Station
 - **Information Panels**:
-  - Grid Status (budget, happiness, generation, demand)
-  - Component Details (selected component info)
-  - Time Control (placeholder for Phase 1)
-- **Visual Polish**: Clean UI with color coding and smooth animations
+  - Grid Status (budget, happiness, generation, demand) - in canvas footer
+  - Component Details (selected component info) - in left sidebar
+  - Time Control (in header with glassmorphism styling)
+- **UI Layout**:
+  - Header with title and time controls
+  - Left sidebar with mode switcher and component details
+  - Central canvas area with React Flow
+  - Canvas footer with 8 grid status metrics in single row
+- **Visual Polish**: Clean UI with color coding, smooth animations, and glassmorphism effects
+- **Voltage Visualization**: Lines rendered with different colors/thickness by voltage (400kV=thick red, 220kV=medium blue, 110kV=thin green)
+- **Placement Mechanics**:
+  - Snap-to-grid (50px) for all component placements
+  - Collision detection prevents node overlap
+  - Visual feedback (green/red outlines) during placement
+  - Line crossing warnings (Phase 0 visual hint, Phase 1 enforcement)
 
 ### Mock Data
 
 The Phase 0 implementation includes comprehensive mock data demonstrating:
 
-- 3 power plants (Nuclear, CCGT, Wind)
-- 3 cities (Berlin, Hamburg, Dresden)
-- 3 transmission lines
-- 1 substation
-- 1 switching station
+- 3 power plants (Nuclear, CCGT, Wind) at 400kV
+- 3 cities (Berlin, Hamburg, Dresden) with 110kV connections
+- Transmission lines at multiple voltages (400kV, 220kV, 110kV)
+- Grid substation (400→220kV) and Zone substation (220→110kV)
+- Switching station for routing
+- Pylons supporting long-distance lines
 
 ## Key Components
 
@@ -147,24 +162,29 @@ Main canvas component using React Flow for rendering the electrical grid as a no
 
 ### Custom Nodes
 
-- **PowerPlantNode**: Displays plant type, capacity, output, and utilization
-- **CityNode**: Shows city name, size, demand, and power delivery status
-- **SubstationNode**: Indicates voltage transformation and load
+- **PowerPlantNode**: Displays plant type, capacity, output, and utilization (400kV output)
+- **CityNode**: Shows city name, size, demand, power delivery status, and connection points (110kV input)
+- **GridSubstationNode**: Indicates 400→220kV voltage transformation and load
+- **ZoneSubstationNode**: Indicates 220→110kV voltage transformation and load
 - **SwitchingStationNode**: Displays breaker status and connected lines
+- **PylonNode**: Shows line capacity utilization (e.g., "2/4 lines")
 
 **Location**: `src/ui/components/nodes/`
 
 ### Custom Edges
 
-- **TransmissionLineEdge**: Shows voltage level and current load percentage
+- **TransmissionLineEdge**: Shows voltage level and current load percentage with voltage-based styling
+  - 400kV: Thick (4px) red/dark lines
+  - 220kV: Medium (3px) blue lines
+  - 110kV: Thin (2px) green lines
 
 **Location**: `src/ui/components/edges/`
 
 ### Information Panels
 
-- **GridStatusPanel**: Overview of grid metrics (generation, demand, budget, happiness)
-- **ComponentDetailsPanel**: Detailed information for selected components
-- **TimeControlPanel**: Placeholder for time simulation controls (Phase 1)
+- **GridStatusPanel**: Overview of 8 grid metrics displayed in canvas footer (generation, demand, budget, happiness, price, utilization, cities powered, uptime)
+- **ComponentDetailsPanel**: Detailed information for selected components, shown in left sidebar below mode switcher
+- **TimeControlPanel**: Time display and controls in header with glassmorphism styling (play/pause/speed controls placeholder for Phase 1)
 
 **Location**: `src/ui/components/panels/`
 
@@ -235,12 +255,28 @@ See [E2E_TESTING.md](./E2E_TESTING.md) for detailed testing guide.
 
 Comprehensive documentation is available in the `docs/` directory:
 
+### Core Design
+
 - **DesignDoc.md**: High-level game design and mechanics
-- **ComponentReference.md**: Component specifications and costs
 - **PhysicsSpec.md**: Power flow calculations and grid physics
 - **GeographyAndEconomy.md**: Geographic constraints and economy
 - **TechnicalSpec.md**: Technical implementation details
 - **DevelopmentApproach.md**: Phased development plan
+
+### Component Reference (Modular)
+
+- **ComponentReference.md**: Index to all component specifications
+- **PowerPlants.md**: Generation sources (Nuclear, CCGT, Hydro, Wind, Solar)
+- **Cities.md**: Load centers with 110kV multi-connection requirements
+- **TransmissionLines.md**: 400kV/220kV/110kV voltage levels
+- **Substations.md**: Grid (400→220) and Zone (220→110) transformation
+- **SwitchingStations.md**: Routing and breaker control
+- **Pylons.md**: Long-distance transmission support
+- **UISpecification.md**: Snap-to-grid and collision detection
+- **GameplayGuide.md**: Strategic guidance and tutorial progression
+
+### AI Assistant Reference
+
 - **CLAUDE.md**: AI assistant guidance
 
 ## License
