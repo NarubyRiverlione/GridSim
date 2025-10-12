@@ -21,10 +21,26 @@
   min-width: 280px;
 }
 
+.canvas-footer .grid-status-panel {
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+
+.canvas-footer .panel-title {
+  display: none;
+}
+
 .status-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
+}
+
+.canvas-footer .status-grid {
+  grid-template-columns: repeat(8, minmax(80px, 100px));
+  gap: 12px;
+  justify-content: center;
 }
 
 .status-item {
@@ -47,13 +63,17 @@
   color: #1f2937;
 }
 
+.canvas-footer .status-value {
+  font-size: 14px;
+}
+
 .happiness-value {
   font-weight: 700;
 }
 
 /* Component Details Panel */
 .details-panel {
-  min-width: 280px;
+  min-width: 200px;
 }
 
 .empty-state {

@@ -40,19 +40,20 @@ export const App = (): React.ReactElement => {
       <div className="app-content">
         <div className="sidebar-left">
           <ModeSwitcher currentMode={mode} onModeChange={setMode} />
-        </div>
-
-        <div className="canvas-area">
-          <GridCanvas
-            components={allComponents}
-            transmissionLines={mockTransmissionLines}
-            onComponentSelect={setSelectedComponent}
-          />
-        </div>
-
-        <div className="sidebar-right">
-          <GridStatusPanel gridState={mockGridState} />
           <ComponentDetailsPanel component={selectedComponent} />
+        </div>
+
+        <div className="canvas-container">
+          <div className="canvas-area">
+            <GridCanvas
+              components={allComponents}
+              transmissionLines={mockTransmissionLines}
+              onComponentSelect={setSelectedComponent}
+            />
+          </div>
+          <div className="canvas-footer">
+            <GridStatusPanel gridState={mockGridState} />
+          </div>
         </div>
       </div>
     </div>
