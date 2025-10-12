@@ -8,18 +8,26 @@ This document details the electrical grid physics model and power flow calculati
 
 GridSim uses a simplified AC power flow model for V1, suitable for real-time gameplay while maintaining educational accuracy about grid behavior.
 
+V1 Modeling Assumptions (explicit)
+
+- Power factor is assumed to be 1.0 for V1 (pf = 1.0). As a result, MVA == MW for all capacity, loading and loss calculations in V1. This simplifies capacity checks and avoids introducing reactive power into the initial solver.
+- The primary solver is a linearized, angle-based DC-style power flow used to compute flows and line currents (see §2). Voltage magnitude / reactive power are not modeled in the solver.
+- A separate, gameplay-oriented voltage-magnitude heuristic is applied post-solve to represent voltage drop effects on delivered power (see §3.2). This heuristic is intentionally decoupled from the DC solver and documented below.
+- Generator ramp rates, equipment aging, and variable renewable output are deferred to V2 unless explicitly noted.
+- tick(deltaSeconds: number) is the canonical simulation tick unit (seconds). Higher-level code converts to hours/MWh as needed for economy calculations.
+
 **Key Simplifications**:
 
-- Simplified AC power flow (no reactive power or voltage magnitude calculations)
-- No reactive power / power factor
+- Simplified AC power flow (no reactive power or voltage magnitude calculations in solver)
+- No reactive power / power factor in solver (pf = 1.0 in V1)
 - Instant generator response (no ramp rates in V1)
 - Fixed seasonal patterns (no random weather)
 
 **Physics Principles**:
 
-- Kirchhoff's laws govern power flow
+- Kirchhoff's laws govern power flow (as approximated by the linearized solver)
 - Power losses increase with distance and current
-- Voltage drops affect power delivery
+- Voltage drops affect power delivery (modeled by a post-solve heuristic)
 - Capacity constraints cause failures
 
 ---
@@ -580,11 +588,38 @@ These constants can be adjusted for gameplay balance:
 
 ### 8.1 Voltage Drop
 
+The V1 implementation uses a tunable heuristic to represent voltage magnitude effects on delivered power. This heuristic is applied after the DC-style solver computes power flows and line currents. The heuristic intentionally keeps the solver lightweight while still communicating the gameplay consequences of long runs and heavy loading.
+
+Units & convention (V1):
+
+- tick(deltaSeconds: number) is the canonical tick unit for the simulation loop.
+- Voltages are expressed as relative fractions of nominal (i.e., V_delivered / V_nominal).
+- The voltage drop coefficient below is a gameplay tuning parameter with the following interpretation:
+  - Units: (per km) × (per unit-load), where per-unit-load = (load / capacity). With the V1 assumption pf = 1.0, load (MW) and capacity (MVA) are comparable.
+  - Effect: V_delivered = V_nominal × (1 - VOLTAGE_DROP_COEFFICIENT × distance_km × (load / capacity))
+
 ```typescript
-const VOLTAGE_DROP_COEFFICIENT = 0.0001 // per km per (MVA/capacity)
+// Tunable constants (V1)
+const VOLTAGE_DROP_COEFFICIENT = 0.0001 // unit: 1/(km * per-unit-load). Example: 0.0001 × 200 km × (150/300) = 0.01 → 1% drop
 const VOLTAGE_WARNING_THRESHOLD = 0.95 // 95%
 const VOLTAGE_CRITICAL_THRESHOLD = 0.9 // 90%
 ```
+
+Worked example (numeric):
+
+- Line: 200 km
+- Line capacity: 300 MW (nominal 110kV line)
+- Actual load on the line delivering to a city: 150 MW
+- Per-unit-load = 150 / 300 = 0.5
+- Voltage drop fraction = VOLTAGE_DROP_COEFFICIENT × distance_km × per-unit-load
+  = 0.0001 × 200 × 0.5 = 0.01 → 1% drop
+- V_delivered = V_nominal × (1 - 0.01) = 0.99 × V_nominal
+- Delivered power to city (voltage-scaling applied): powerDelivered = powerDemanded × (V_delivered / V_nominal)
+  Example: city demands 100 MW → receives ~99 MW after voltage scaling
+
+Notes:
+
+- The coefficient is intentionally tunable for gameplay balancing. If you later add explicit resistance/reactance-based voltage magnitude modeling, replace this heuristic with the physics-derived values.
 
 ### 8.2 Line Losses
 
@@ -636,8 +671,16 @@ const CAPACITY_TRIP_THRESHOLD = 1.0 // 100% utilization
 **Separation**:
 
 ```typescript
-// Simulation loop (variable rate)
-setInterval(() => simulation.tick(), 1000 / SIMULATION_HZ)
+let lastTime = performance.now()
+
+const interval = setInterval(() => {
+  const now = performance.now()
+  const deltaSeconds = (now - lastTime) / 1000
+  lastTime = now
+
+  // tick expects seconds (deltaSeconds). Simulation internal speed multiplier applies as needed.
+  simulation.tick(deltaSeconds)
+}, 1000 / SIMULATION_HZ) // simulation driver
 
 // Render loop (60 FPS)
 requestAnimationFrame(render)

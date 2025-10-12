@@ -10,7 +10,7 @@ Strategic guidance for component selection and grid management across different 
 
 **Recommended Components**:
 
-- **Generation**: 1x CCGT (600 MW) - €1B - Good flexibility for small loads
+- **Generation**: 1x CCGT (600 MW - see ComponentReference.md) - €1B - Good flexibility for small loads
 - **Transmission**: 110 kV transmission lines - Sufficient for short distances
 - **Substations**: Minimal substations - Keep it simple
 - **Strategy**: Focus on connecting small towns economically

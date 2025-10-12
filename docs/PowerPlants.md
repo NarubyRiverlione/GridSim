@@ -20,7 +20,7 @@ All plants auto-dispatch to match demand up to their maximum capacity in V1.
 - **Capacity**: 500-1000 MW
 - **Type**: Baseload/intermediate
 - **Ramp Rate**: Medium (30-60 min)
-- **Construction Cost**: €2-3B (800 MW)
+- **Construction Cost**: €2-3B (coal default 800 MW — see ComponentReference.md)
 - **Operating Characteristics**: Being phased out, moderate flexibility
 - **V1 Behavior**: Auto-dispatch up to capacity
 - **Typical Use**: Supplement baseload, being replaced by cleaner sources
@@ -31,7 +31,7 @@ All plants auto-dispatch to match demand up to their maximum capacity in V1.
 - **Capacity**: 400-800 MW
 - **Type**: Peaking/intermediate
 - **Ramp Rate**: Fast (10-15 min)
-- **Construction Cost**: €800M-1.2B (600 MW)
+- **Construction Cost**: €800M-1.2B (CCGT default 600 MW — see ComponentReference.md)
 - **Operating Characteristics**: Good for load following, flexible
 - **V1 Behavior**: Auto-dispatch up to capacity
 - **Typical Use**: Handle demand fluctuations, peak load
@@ -42,7 +42,7 @@ All plants auto-dispatch to match demand up to their maximum capacity in V1.
 - **Capacity**: 100-2000 MW
 - **Type**: Dispatchable/peaking
 - **Ramp Rate**: Instant
-- **Construction Cost**: €2-4B (500 MW, location dependent)
+- **Construction Cost**: €2-4B (hydro default 500 MW, location dependent — see ComponentReference.md)
 - **Operating Characteristics**: Perfect for balancing, limited by water availability
 - **V1 Behavior**: Auto-dispatch up to capacity
 - **Typical Use**: Rapid response to demand changes, emergency reserves
@@ -53,7 +53,7 @@ All plants auto-dispatch to match demand up to their maximum capacity in V1.
 
 - **Capacity**: 400-1200 MW (farms)
 - **Type**: Variable (V2 feature - intermittent generation)
-- **Construction Cost**: €1.5-2.5B (800 MW farm)
+- **Construction Cost**: €1.5-2.5B (wind offshore default 800 MW farm — see ComponentReference.md)
 - **Location Constraint**: Coastal areas
 - **V1 Behavior**: Auto-dispatch up to capacity (no variability yet)
 - **V2 Enhancement**: Weather-dependent generation

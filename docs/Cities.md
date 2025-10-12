@@ -2,7 +2,7 @@
 
 Cities consume power and generate revenue. Demand varies by time of day and season.
 
-**Critical**: Cities **always connect at 110kV**. Each 110kV transmission line has a capacity limit of ~300 MW. Large cities requiring more than 300 MW **must have multiple 110kV connections**.
+**Critical**: Cities **always connect at 110kV**. Each 110kV transmission line has a nominal capacity of 300 MVA (see ComponentReference.md). Under the V1 modeling assumption (power factor = 1.0) treat 300 MVA == 300 MW for capacity and load calculations. Large cities requiring more than 300 MW must have multiple 110kV connections.
 
 ---
 

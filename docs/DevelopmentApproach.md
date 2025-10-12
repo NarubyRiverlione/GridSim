@@ -630,7 +630,7 @@ interface SaveData {
 
 **Tutorial Flow** (from DesignDoc.md Section 9.1):
 
-1. Start with 1 power plant (800 MW CCGT) and 1 small city (30 MW) disconnected
+1. Start with 1 power plant (CCGT default 600 MW) and 1 small city (30 MW) disconnected
 2. Prompt player to draw transmission line
 3. Show power flowing to city
 4. Display revenue generation

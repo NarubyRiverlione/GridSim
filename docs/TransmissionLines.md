@@ -2,6 +2,14 @@
 
 Lines transport power between nodes. Voltage level affects capacity, losses, and cost.
 
+Canonical nominal capacities and costs for V1 are defined in ComponentReference.md (recommended source of truth). For quick reference:
+
+- 400 kV nominal capacity: 1500 MVA (ComponentReference.md)
+- 220 kV nominal capacity: 600 MVA (ComponentReference.md)
+- 110 kV nominal capacity: 300 MVA (ComponentReference.md)
+
+Refer to ComponentReference.md when using specific numeric values in tutorials or examples to keep documentation consistent.
+
 **Critical Design Rule**: Line voltage is **always auto-determined** by source/target nodes. Player cannot choose voltage - it's physically determined by the network topology.
 
 ---

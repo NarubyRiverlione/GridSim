@@ -2,6 +2,43 @@
 
 This document serves as an index to the detailed component specifications. Each component type has its own dedicated document for easier navigation and maintenance.
 
+Canonical Defaults (V1)
+
+- The table below defines canonical default values used across the documentation and the reference implementation for V1. Use these values as the single source of truth for examples, tutorials, and balancing. For physics formulas and solver behavior see PhysicsSpec.md.
+
+| Component / Item        | Canonical Default (V1) | Notes / Source |
+| ----------------------- | ---------------------- | -------------- |
+| CCGT (default)          | 600 MW, €1.0B          | PowerPlants.md |
+| Nuclear (default)       | 1000 MW, €5.0B         | PowerPlants.md |
+| Coal (default)          | 800 MW, €2.5B          | PowerPlants.md |
+| Hydro (default)         | 500 MW, €3.0B          | PowerPlants.md |
+| Wind Offshore (default) | 800 MW, €2.0B          | PowerPlants.md |
+| Wind Onshore (default)  | 100 MW, €200M          | PowerPlants.md |
+| Solar (default)         | 100 MW, €150M          | PowerPlants.md |
+
+| Voltage / Line (default) | Capacity (nominal) | Cost / km (nominal) | Max span (no pylons) | Base loss /100km     |
+| ------------------------ | ------------------ | ------------------- | -------------------- | -------------------- |
+| 400 kV                   | 1500 MVA           | €1.5M/km            | 100 km               | 3% (BASE_LOSS_400KV) |
+| 220 kV                   | 600 MVA            | €800k/km            | 75 km                | 4% (BASE_LOSS_220KV) |
+| 110 kV                   | 300 MVA            | €400k/km            | 50 km                | 5% (BASE_LOSS_110KV) |
+
+| Substation Type | Typical Capacity (nominal) | Construction Cost (nominal) |
+| --------------- | -------------------------- | --------------------------- |
+| Grid Substation | 1000 MVA                   | €65M                        |
+| Zone Substation | 400 MVA                    | €30M                        |
+
+| Other Infrastructure | Nominal Cost | Notes                            |
+| -------------------- | ------------ | -------------------------------- |
+| Switching Station    | €7M          | Breaker control, routing         |
+| Pylon (default)      | €0.75M       | Supports up to 4 lines (Phase 1) |
+
+Notes:
+
+- V1 modeling assumption: power factor = 1.0 (pf = 1.0) → MVA == MW for capacity/load/loss calculations (see PhysicsSpec.md and TechnicalSpec.md).
+- These canonical defaults should be referenced by other docs (tutorials, examples) rather than hardcoding alternative numbers inline.
+- For tunable gameplay constants (losses, voltage-drop coefficient), consult PhysicsSpec.md §8.
+- If you change a canonical value, update ComponentReference.md and then update all docs that reference it.
+
 ---
 
 ## Component Documents
