@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init:*)",
+      "Bash(git checkout:*)",
+      "Bash(pnpm create:*)",
+      "Bash(pnpm init)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm exec husky:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
