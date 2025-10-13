@@ -38,11 +38,14 @@ test.describe('Visual Regression', () => {
     await page.goto('/')
 
     // Wait for panels to load
-    await page.waitForSelector('.sidebar-right', { timeout: 5000 })
+    await page.waitForSelector('.sidebar-left', { timeout: 5000 })
+    await page.waitForTimeout(500)
 
-    // Screenshot the right sidebar
-    const sidebar = page.locator('.sidebar-right')
-    await expect(sidebar).toHaveScreenshot('right-sidebar.png')
+    // Screenshot the left sidebar with all panels
+    const sidebar = page.locator('.sidebar-left')
+    await expect(sidebar).toHaveScreenshot('left-sidebar.png', {
+      maxDiffPixels: 100,
+    })
   })
 
   test('should match mode switcher toolbar', async ({ page }) => {

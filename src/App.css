@@ -80,6 +80,9 @@
   padding: 12px 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border-radius: 0 0 8px 8px;
+  pointer-events: all;
+  position: relative;
+  z-index: 1;
 }
 
 @media (max-width: 1200px) {

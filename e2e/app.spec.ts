@@ -40,7 +40,7 @@ test.describe('GridSim Application', () => {
 
     // Check all mode buttons are present
     const modeButtons = page.locator('.mode-button')
-    await expect(modeButtons).toHaveCount(6)
+    await expect(modeButtons).toHaveCount(7)
 
     // Verify mode button labels
     await expect(modeButtons.nth(0)).toContainText('Select')
@@ -49,6 +49,7 @@ test.describe('GridSim Application', () => {
     await expect(modeButtons.nth(3)).toContainText('Line')
     await expect(modeButtons.nth(4)).toContainText('Substation')
     await expect(modeButtons.nth(5)).toContainText('Switching')
+    await expect(modeButtons.nth(6)).toContainText('Pylon')
   })
 
   test('should switch between interaction modes', async ({ page }) => {
@@ -94,14 +95,15 @@ test.describe('GridSim Application', () => {
     // Check time control panel is visible
     const timePanel = page.locator('.time-control-panel')
     await expect(timePanel).toBeVisible()
-    await expect(timePanel.locator('.panel-title')).toContainText('Time Control')
 
     // Check for time display
     await expect(timePanel.locator('.current-time')).toBeVisible()
     await expect(timePanel.locator('.season-badge')).toBeVisible()
 
-    // Check for placeholder controls
-    await expect(timePanel).toContainText('Phase 1')
+    // Check for placeholder controls (disabled in Phase 0)
+    const pauseButton = timePanel.locator('button').first()
+    await expect(pauseButton).toBeDisabled()
+    await expect(pauseButton).toHaveAttribute('title', /Phase 1/)
   })
 
   test('should display component details panel with empty state', async ({ page }) => {

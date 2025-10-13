@@ -20,6 +20,19 @@
 
 .custom-node.selected {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+  animation: pulse-selection 2s ease-in-out infinite;
+}
+
+@keyframes pulse-selection {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+  }
+  50% {
+    box-shadow:
+      0 0 0 3px rgba(59, 130, 246, 0.8),
+      0 0 20px rgba(59, 130, 246, 0.3);
+  }
 }
 
 .node-icon {
@@ -92,4 +105,58 @@
 
 .react-flow__handle:hover {
   background: #2563eb;
+}
+
+/* Ghost node styles for placement preview */
+.ghost-node {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px dashed;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.ghost-node.valid {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+  animation: pulse-valid 1s ease-in-out infinite;
+}
+
+.ghost-node.invalid {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes pulse-valid {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+.ghost-node-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  padding: 4px 8px;
 }

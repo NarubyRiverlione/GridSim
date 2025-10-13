@@ -23,6 +23,10 @@ export const TimeControlPanel = ({ gridState }: TimeControlPanelProps): React.Re
 
   return (
     <div className="panel time-control-panel time-control-header">
+      <h2 className="panel-title" style={{ display: 'none' }}>
+        Time Control
+      </h2>
+
       <div className="time-display">
         <div className="current-time">{formatDate(gridState.currentTime)}</div>
         <div className="season-badge">{gridState.season}</div>

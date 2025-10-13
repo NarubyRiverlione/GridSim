@@ -2,81 +2,149 @@
  * Main grid canvas component using React Flow
  */
 
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useRef, useEffect } from 'react'
 import ReactFlow, {
   Background,
   Controls,
   MiniMap,
   type Node,
   type Edge,
-  type NodeTypes,
-  type EdgeTypes,
   useNodesState,
   useEdgesState,
+  useReactFlow,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 
-import { CityNode, PowerPlantNode, SubstationNode, SwitchingStationNode } from '../nodes'
-import { TransmissionLineEdge } from '../edges'
-import type { Component, TransmissionLine } from '@/types'
+import { Component, TransmissionLine, InteractionMode, SubstationType } from '@/types'
+import type { PlacementState, PlacementConfig } from '@/ui/hooks/useComponentPlacement'
+import type { LineDrawingState } from '@/ui/hooks/useLinePlacement'
+import { getComponentSize } from '@/ui/utils/placement'
 import './CanvasStyles.css'
+import { getNodeTypes, getEdgeTypes } from '../nodeEdgeTypes'
+
+// Ensure nodeTypes and edgeTypes are stable by defining them at module scope
+const stableNodeTypes = getNodeTypes()
+const stableEdgeTypes = getEdgeTypes()
 
 interface GridCanvasProps {
   components: Component[]
   transmissionLines: TransmissionLine[]
   onComponentSelect: (component: Component | TransmissionLine | null) => void
+  mode: InteractionMode
+  placementState: PlacementState
+  placementConfig: PlacementConfig
+  onMouseMove: (x: number, y: number) => void
+  onPlacementClick: (x: number, y: number) => Component | null
+  onComponentAdd: (component: Component) => void
+  lineDrawingState: LineDrawingState
+  onNodeClickForLine: (node: Component) => void
+  onMouseMoveForLine: (x: number, y: number) => void
+  onLineAdd: (source: Component, target: Component) => void
 }
+
+const GHOST_NODE_ID = 'ghost-preview-node'
 
 export const GridCanvas = ({
   components,
   transmissionLines,
   onComponentSelect,
+  mode,
+  placementState,
+  placementConfig,
+  onMouseMove,
+  onPlacementClick,
+  onComponentAdd,
+  lineDrawingState,
+  onNodeClickForLine,
+  onMouseMoveForLine,
+  onLineAdd,
 }: GridCanvasProps): React.ReactElement => {
+  const reactFlowWrapper = useRef<HTMLDivElement>(null)
+  const { screenToFlowPosition } = useReactFlow()
+
   // Convert components to React Flow nodes
-  const initialNodes: Node[] = components.map(component => ({
-    id: component.id,
-    type: getNodeType(component),
-    position: component.location,
-    data: component,
-  }))
+  const componentNodes: Node[] = useMemo(
+    () =>
+      components.map(component => ({
+        id: component.id,
+        type: getNodeType(component),
+        position: component.location,
+        data: component,
+      })),
+    [components]
+  )
+
+  // Add ghost node if placing
+  const allNodes = useMemo(() => {
+    if (placementState.isPlacing && placementState.ghostPosition !== null) {
+      const ghostNode: Node = {
+        id: GHOST_NODE_ID,
+        type: 'ghost',
+        position: placementState.ghostPosition,
+        data: {
+          isValid: placementState.isValidPosition,
+          size: getComponentSize({ type: mode, ...placementConfig }),
+          label: getPlacementLabel(mode, placementConfig),
+        },
+        draggable: false,
+        selectable: false,
+      }
+      return [...componentNodes, ghostNode]
+    }
+    return componentNodes
+  }, [componentNodes, placementState, mode, placementConfig])
 
   // Convert transmission lines to React Flow edges
-  const initialEdges: Edge[] = transmissionLines.map(line => ({
-    id: line.id,
-    source: line.from,
-    target: line.to,
-    type: 'transmission',
-    data: line,
-  }))
-
-  const [nodes, , onNodesChange] = useNodesState(initialNodes)
-  const [edges, , onEdgesChange] = useEdgesState(initialEdges)
-
-  // Define custom node types
-  const nodeTypes: NodeTypes = useMemo(
-    () => ({
-      powerPlant: PowerPlantNode,
-      city: CityNode,
-      substation: SubstationNode,
-      switchingStation: SwitchingStationNode,
-    }),
-    []
+  const edgesData: Edge[] = useMemo(
+    () =>
+      transmissionLines.map(line => ({
+        id: line.id,
+        source: line.from,
+        target: line.to,
+        type: 'transmission',
+        data: line,
+      })),
+    [transmissionLines]
   )
 
-  // Define custom edge types
-  const edgeTypes: EdgeTypes = useMemo(
-    () => ({
-      transmission: TransmissionLineEdge,
-    }),
-    []
-  )
+  const [nodes, setNodes, onNodesChange] = useNodesState(allNodes)
+  const [edges, setEdges, onEdgesChange] = useEdgesState(edgesData)
 
-  // Handle node selection
+  // Update nodes when components or placement state changes
+  useEffect(() => {
+    setNodes(allNodes)
+  }, [allNodes, setNodes])
+
+  // Update edges when transmission lines change
+  useEffect(() => {
+    setEdges(edgesData)
+  }, [edgesData, setEdges])
+
+
+
+
+  // Handle node selection or line drawing
   const handleNodeClick = useCallback(
     (_event: React.MouseEvent, node: Node): void => {
-      onComponentSelect(node.data as Component)
+      if (node.id === GHOST_NODE_ID) return
+
+      const component = node.data as Component
+
+      // If in line drawing mode, handle line placement
+      if (mode === InteractionMode.AddTransmissionLine) {
+        // If completing a line (second click), create it first
+        if (lineDrawingState.isDrawing && lineDrawingState.sourceNode !== null) {
+          onLineAdd(lineDrawingState.sourceNode, component)
+        }
+
+        // Then update the line drawing state
+        onNodeClickForLine(component)
+      } else {
+        // Otherwise, select the component
+        onComponentSelect(component)
+      }
     },
-    [onComponentSelect]
+    [mode, onComponentSelect, onNodeClickForLine, lineDrawingState, onLineAdd]
   )
 
   // Handle edge selection
@@ -87,13 +155,41 @@ export const GridCanvas = ({
     [onComponentSelect]
   )
 
-  // Handle pane click (deselect)
+  // Handle pane click (deselect or place component)
   const handlePaneClick = useCallback((): void => {
-    onComponentSelect(null)
-  }, [onComponentSelect])
+    if (placementState.isPlacing && placementState.isValidPosition && placementState.ghostPosition !== null) {
+      // Place the component
+      const newComponent = onPlacementClick(placementState.ghostPosition.x, placementState.ghostPosition.y)
+      if (newComponent !== null) {
+        onComponentAdd(newComponent)
+      }
+    } else {
+      // Deselect
+      onComponentSelect(null)
+    }
+  }, [placementState, onPlacementClick, onComponentAdd, onComponentSelect])
+
+  // Handle mouse move for placement preview and line drawing
+  const handleMouseMove = useCallback(
+    (event: React.MouseEvent): void => {
+      if (reactFlowWrapper.current === null) return
+
+      const position = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      })
+
+      // Update placement preview
+      onMouseMove(position.x, position.y)
+
+      // Update line drawing preview
+      onMouseMoveForLine(position.x, position.y)
+    },
+  [onMouseMove, onMouseMoveForLine, screenToFlowPosition]
+  )
 
   return (
-    <div className="grid-canvas">
+    <div className="grid-canvas" ref={reactFlowWrapper} onMouseMove={handleMouseMove}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -102,8 +198,8 @@ export const GridCanvas = ({
         onNodeClick={handleNodeClick}
         onEdgeClick={handleEdgeClick}
         onPaneClick={handlePaneClick}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
+        nodeTypes={stableNodeTypes}
+        edgeTypes={stableEdgeTypes}
         fitView
         minZoom={0.2}
         maxZoom={2}
@@ -130,8 +226,30 @@ const getNodeType = (component: Component): string => {
   if ('voltageIn' in component && 'voltageOut' in component) {
     return 'substation'
   }
-  if ('connectedLines' in component) {
+  if ('maxLines' in component && !('breakers' in component)) {
+    return 'pylon'
+  }
+  if ('connectedLines' in component && 'breakers' in component) {
     return 'switchingStation'
   }
   return 'default'
+}
+
+const getPlacementLabel = (mode: InteractionMode, config: PlacementConfig): string => {
+  if (mode === InteractionMode.AddPowerPlant) {
+    return config.plantType
+  }
+  if (mode === InteractionMode.AddCity) {
+    return config.citySize
+  }
+  if (mode === InteractionMode.AddSubstation) {
+    return config.substationType === SubstationType.Grid ? 'Grid Sub' : 'Zone Sub'
+  }
+  if (mode === InteractionMode.AddSwitchingStation) {
+    return 'Switching'
+  }
+  if (mode === InteractionMode.AddPylon) {
+    return 'Pylon'
+  }
+  return 'Component'
 }

@@ -64,3 +64,52 @@
   text-align: left;
   white-space: nowrap;
 }
+
+/* Build Menu Styles */
+.build-menu {
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 12px;
+}
+
+.build-menu-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 8px 0;
+}
+
+.build-menu-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.build-option {
+  padding: 8px 12px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  text-align: left;
+}
+
+.build-option:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.build-option.selected {
+  background: #dbeafe;
+  border-color: #3b82f6;
+  color: #1e40af;
+  font-weight: 600;
+}

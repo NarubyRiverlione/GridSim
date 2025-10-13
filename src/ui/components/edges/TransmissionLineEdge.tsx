@@ -28,7 +28,7 @@ export const TransmissionLineEdge = memo(
       data?.state === ComponentState.Healthy || data?.state === ComponentState.Stressed ? voltageColor : stateColor
 
     return (
-      <>
+      <g className="react-flow__edge" data-type="transmission-line">
         <BaseEdge id={id} path={edgePath} style={{ stroke: strokeColor, strokeWidth }} />
         <EdgeLabelRenderer>
           <div
@@ -45,7 +45,7 @@ export const TransmissionLineEdge = memo(
             </div>
           </div>
         </EdgeLabelRenderer>
-      </>
+      </g>
     )
   }
 )

@@ -3,3 +3,4 @@
  */
 
 export { ModeSwitcher } from './ModeSwitcher'
+export { BuildMenu } from './BuildMenu'
