@@ -42,6 +42,7 @@ test.describe('Component Placement System', () => {
 
     // Count initial nodes
     const initialCount = await page.locator('.react-flow__node').count()
+    expect(initialCount).toBe(6)
 
     // Switch to power plant mode
     await page.locator('button:has-text("Power Plant")').click()
@@ -53,9 +54,9 @@ test.describe('Component Placement System', () => {
     // Wait for new node to appear
     await page.waitForTimeout(500)
 
-    // Should have one more node
+    // Should have two more nodes
     const newCount = await page.locator('.react-flow__node').count()
-    expect(newCount).toBe(initialCount + 1)
+    expect(newCount).toBe(8)
   })
 
   test('should select plant type before placing', async ({ page }) => {
@@ -88,6 +89,8 @@ test.describe('Component Placement System', () => {
 
     const initialCount = await page.locator('.react-flow__node').count()
 
+    expect(initialCount).toBe(6)
+
     // Switch to city mode
     await page.locator('button:has-text("City")').click()
 
@@ -100,9 +103,9 @@ test.describe('Component Placement System', () => {
 
     await page.waitForTimeout(500)
 
-    // Should have one more node
+    // Should have two more nodes
     const newCount = await page.locator('.react-flow__node').count()
-    expect(newCount).toBe(initialCount + 1)
+    expect(newCount).toBe(8)
   })
 
   test('should place substation with type selection', async ({ page }) => {
@@ -110,6 +113,8 @@ test.describe('Component Placement System', () => {
     await page.waitForSelector('.mode-switcher', { timeout: 5000 })
 
     const initialCount = await page.locator('.react-flow__node').count()
+
+    expect(initialCount).toBe(6)
 
     // Switch to substation mode
     await page.locator('button:has-text("Substation")').click()
@@ -128,7 +133,7 @@ test.describe('Component Placement System', () => {
     await page.waitForTimeout(500)
 
     const newCount = await page.locator('.react-flow__node').count()
-    expect(newCount).toBe(initialCount + 1)
+    expect(newCount).toBe(8)
   })
 
   test('should place switching station', async ({ page }) => {
@@ -136,6 +141,8 @@ test.describe('Component Placement System', () => {
     await page.waitForSelector('.mode-switcher', { timeout: 5000 })
 
     const initialCount = await page.locator('.react-flow__node').count()
+
+    expect(initialCount).toBe(6)
 
     // Switch to switching station mode
     await page.locator('button:has-text("Switching")').click()
@@ -147,7 +154,7 @@ test.describe('Component Placement System', () => {
     await page.waitForTimeout(500)
 
     const newCount = await page.locator('.react-flow__node').count()
-    expect(newCount).toBe(initialCount + 1)
+    expect(newCount).toBe(8)
   })
 
   test('should place pylon', async ({ page }) => {
@@ -155,6 +162,8 @@ test.describe('Component Placement System', () => {
     await page.waitForSelector('.mode-switcher', { timeout: 5000 })
 
     const initialCount = await page.locator('.react-flow__node').count()
+
+    expect(initialCount).toBe(6)
 
     // Switch to pylon mode
     await page.locator('button:has-text("Pylon")').click()
@@ -166,6 +175,6 @@ test.describe('Component Placement System', () => {
     await page.waitForTimeout(500)
 
     const newCount = await page.locator('.react-flow__node').count()
-    expect(newCount).toBe(initialCount + 1)
+    expect(newCount).toBe(8)
   })
 })

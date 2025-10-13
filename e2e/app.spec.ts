@@ -127,7 +127,7 @@ test.describe('GridSim Application', () => {
     // Check that nodes are present
     const nodes = page.locator('.react-flow__node')
     const nodeCount = await nodes.count()
-    expect(nodeCount).toBeGreaterThan(0)
+    expect(nodeCount).toBe(6)
 
     // Check for different node types
     await expect(page.locator('.plant-node').first()).toBeVisible()
@@ -143,7 +143,7 @@ test.describe('GridSim Application', () => {
     // Check that edges are present
     const edges = page.locator('.react-flow__edge')
     const edgeCount = await edges.count()
-    expect(edgeCount).toBeGreaterThan(0)
+    expect(edgeCount).toBe(10)
 
     // Check for edge labels
     await expect(page.locator('.edge-label').first()).toBeVisible()

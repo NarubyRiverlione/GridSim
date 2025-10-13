@@ -120,9 +120,6 @@ export const GridCanvas = ({
     setEdges(edgesData)
   }, [edgesData, setEdges])
 
-
-
-
   // Handle node selection or line drawing
   const handleNodeClick = useCallback(
     (_event: React.MouseEvent, node: Node): void => {
@@ -185,7 +182,7 @@ export const GridCanvas = ({
       // Update line drawing preview
       onMouseMoveForLine(position.x, position.y)
     },
-  [onMouseMove, onMouseMoveForLine, screenToFlowPosition]
+    [onMouseMove, onMouseMoveForLine, screenToFlowPosition]
   )
 
   return (
