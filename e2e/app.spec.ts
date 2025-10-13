@@ -145,7 +145,13 @@ test.describe('GridSim Application', () => {
     const edgeCount = await edges.count()
     expect(edgeCount).toBe(10)
 
-    // Check for edge labels
+    // Check for edge labels (hidden by default, visible on hover)
+    await expect(page.locator('.edge-label')).toBeHidden()
+
+    // Hover over first edge to show label
+    const firstEdge = edges.first()
+    const firstEdgePath = firstEdge.locator('.react-flow__edge-path')
+    await firstEdgePath.hover()
     await expect(page.locator('.edge-label').first()).toBeVisible()
   })
 

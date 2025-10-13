@@ -110,11 +110,20 @@ test.describe('Component Interactions', () => {
   test('should show transmission line voltage and load', async ({ page }) => {
     await page.goto('/')
 
-    // Wait for edges and labels to render
-    await page.waitForSelector('.edge-label', { timeout: 5000 })
+    // Wait for edges to render
+    await page.waitForSelector('.react-flow__edge', { timeout: 5000 })
 
-    // Check edge label content
+    // Labels should be hidden by default
+    await expect(page.locator('.edge-label')).toBeHidden()
+
+    // Hover over first edge to show label
+    const firstEdge = page.locator('.react-flow__edge').first()
+    const firstEdgePath = firstEdge.locator('.react-flow__edge-path')
+    await firstEdgePath.hover()
+
+    // Check edge label content appears on hover
     const edgeLabel = page.locator('.edge-label').first()
+    await expect(edgeLabel).toBeVisible()
     await expect(edgeLabel).toContainText('kV')
     await expect(edgeLabel).toContainText('load')
   })
