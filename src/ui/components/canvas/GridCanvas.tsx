@@ -15,12 +15,23 @@ import ReactFlow, {
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 
-import { Component, TransmissionLine, InteractionMode, SubstationType } from '@/types'
+import { Component, TransmissionLine, InteractionMode } from '@/types'
 import type { PlacementState, PlacementConfig } from '@/ui/hooks/useComponentPlacement'
 import type { LineDrawingState } from '@/ui/hooks/useLinePlacement'
 import { getComponentSize, checkCollision, snapPointToGrid } from '@/ui/utils/placement'
 import './CanvasStyles.css'
 import { getNodeTypes, getEdgeTypes } from '../nodeEdgeTypes'
+import {
+  componentsToNodes,
+  linesToEdges,
+  createGhostNode,
+  getSizeForMode,
+  getPlacementLabel,
+  isPlacementMode,
+  shallowNodesEqual,
+  shallowEdgesEqual,
+  GHOST_NODE_ID,
+} from './gridCanvasUtils'
 
 // Ensure nodeTypes and edgeTypes are stable by defining them at module scope
 const stableNodeTypes = getNodeTypes()
@@ -44,8 +55,6 @@ interface GridCanvasProps {
   onPlacementBlocked?: (message: string) => void
   placementBuffer?: number
 }
-
-const GHOST_NODE_ID = 'ghost-preview-node'
 
 export const GridCanvas = ({
   components,
@@ -83,75 +92,28 @@ export const GridCanvas = ({
   }, [placementBuffer])
 
   // Convert components to React Flow nodes
-  const componentNodes: Node[] = useMemo(
-    () =>
-      components.map(component => ({
-        id: component.id,
-        type: getNodeType(component),
-        position: component.location,
-        data: component,
-      })),
-    [components]
-  )
+  const componentNodes: Node[] = useMemo(() => componentsToNodes(components), [components])
 
   // Add ghost node if placing
   const allNodes = useMemo(() => {
     // Only render the ghost preview when placementState has an explicit ghostPosition
     if (placementState.isPlacing && placementState.ghostPosition !== null) {
       const ghostPos = placementState.ghostPosition
-      const ghostNode: Node = {
-        id: GHOST_NODE_ID,
-        type: 'ghost',
-        position: ghostPos,
-        data: {
-          isValid: placementState.isValidPosition,
-          size: getComponentSize({ type: mode, ...placementConfig }),
-          label: getPlacementLabel(mode, placementConfig),
-        },
-        draggable: false,
-        selectable: false,
-      }
+      const size = getSizeForMode(mode, placementConfig)
+      const label = getPlacementLabel(mode, placementConfig)
+      const ghostNode = createGhostNode(ghostPos, placementState.isValidPosition, size, label)
       return [...componentNodes, ghostNode]
     }
     return componentNodes
   }, [componentNodes, placementState, mode, placementConfig])
 
   // Convert transmission lines to React Flow edges
-  const edgesData: Edge[] = useMemo(
-    () =>
-      transmissionLines.map(line => ({
-        id: line.id,
-        source: line.from,
-        target: line.to,
-        type: 'transmission',
-        data: line,
-      })),
-    [transmissionLines]
-  )
+  const edgesData: Edge[] = useMemo(() => linesToEdges(transmissionLines), [transmissionLines])
 
   const [nodes, setNodes, onNodesChange] = useNodesState(allNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState(edgesData)
   // Keep previous values to avoid calling setNodes when nothing changed
   const prevAllNodesRef = useRef<Node[] | null>(null)
-
-  const shallowNodesEqual = useCallback((a: Node[], b: Node[] | null): boolean => {
-    if (b === null) return false
-    if (a.length !== b.length) return false
-    for (let i = 0; i < a.length; i++) {
-      const na = a[i]
-      const nb = b[i]
-      if (!na || !nb) return false
-      if (na.id !== nb.id) return false
-      const pa = na.position as { x?: number; y?: number } | undefined
-      const pb = nb.position as { x?: number; y?: number } | undefined
-      if ((pa?.x ?? 0) !== (pb?.x ?? 0) || (pa?.y ?? 0) !== (pb?.y ?? 0)) return false
-      if ((na.className ?? '') !== (nb.className ?? '')) return false
-      const da = na.data as { id?: string } | undefined
-      const db = nb.data as { id?: string } | undefined
-      if ((da?.id ?? '') !== (db?.id ?? '')) return false
-    }
-    return true
-  }, [])
 
   // Update nodes when components or placement state changes, but avoid no-op updates
   useEffect(() => {
@@ -165,24 +127,10 @@ export const GridCanvas = ({
     console.debug('GridCanvas effect: setNodes called, allNodes length=', allNodes.length)
     setNodes(allNodes)
     prevAllNodesRef.current = allNodes
-  }, [allNodes, setNodes, shallowNodesEqual])
+  }, [allNodes, setNodes])
 
   // Keep previous edges to avoid calling setEdges when nothing changed
   const prevEdgesRef = useRef<Edge[] | null>(null)
-  const shallowEdgesEqual = useCallback((a: Edge[], b: Edge[] | null): boolean => {
-    if (b === null) return false
-    if (a.length !== b.length) return false
-    for (let i = 0; i < a.length; i++) {
-      const ea = a[i]
-      const eb = b[i]
-      if (!ea || !eb) return false
-      if (ea.id !== eb.id) return false
-      if (ea.source !== eb.source || ea.target !== eb.target) return false
-      // assume data content identity matters; if it's the same reference it's fine
-      if (ea.data !== eb.data) return false
-    }
-    return true
-  }, [])
 
   // Update edges when transmission lines change, avoid no-op updates
   useEffect(() => {
@@ -196,7 +144,7 @@ export const GridCanvas = ({
     console.debug('GridCanvas effect: setEdges called, edgesData length=', edgesData.length)
     setEdges(edgesData)
     prevEdgesRef.current = edgesData
-  }, [edgesData, setEdges, shallowEdgesEqual])
+  }, [edgesData, setEdges])
 
   // Handle node selection or line drawing
   const handleNodeClick = useCallback(
@@ -206,18 +154,11 @@ export const GridCanvas = ({
       const component = node.data as Component
 
       // If in placement mode, treat clicking a node as an attempt to place at its location
-      const isPlacementMode =
-        mode === InteractionMode.AddPowerPlant ||
-        mode === InteractionMode.AddCity ||
-        mode === InteractionMode.AddSubstation ||
-        mode === InteractionMode.AddSwitchingStation ||
-        mode === InteractionMode.AddPylon
-
-      if (isPlacementMode) {
+      if (isPlacementMode(mode)) {
         // Use the node's canonical location for placement attempt
         const placeX = component.location.x
         const placeY = component.location.y
-        const size = getComponentSize({ type: mode, ...placementConfig })
+        const size = getSizeForMode(mode, placementConfig)
         const collides = checkCollision(placeX, placeY, size, components, undefined, placementBuffer)
         if (collides) {
           if (typeof onPlacementBlocked === 'function') onPlacementBlocked('Placement blocked: space occupied')
@@ -270,39 +211,12 @@ export const GridCanvas = ({
   // Handle pane click (deselect or place component)
   const handlePaneClick = useCallback(
     (event?: React.MouseEvent): void => {
-      const isPlacementMode =
-        mode === InteractionMode.AddPowerPlant ||
-        mode === InteractionMode.AddCity ||
-        mode === InteractionMode.AddSubstation ||
-        mode === InteractionMode.AddSwitchingStation ||
-        mode === InteractionMode.AddPylon
-
-      if (isPlacementMode) {
+      if (isPlacementMode(mode)) {
         // Prefer using the actual click event coordinates when available (tests click directly).
         const clickPos = event
           ? screenToFlowPosition({ x: event.clientX, y: event.clientY })
           : placementState.ghostPosition
         if (!clickPos) return
-
-        const getSizeForMode = (m: InteractionMode, cfg: PlacementConfig): number => {
-          switch (m) {
-            case InteractionMode.AddPowerPlant:
-              return 80
-            case InteractionMode.AddCity: {
-              const citySize = cfg.citySize
-              if (citySize === undefined) return 50
-              return 60
-            }
-            case InteractionMode.AddSubstation:
-              return cfg.substationType === SubstationType.Grid ? 60 : 50
-            case InteractionMode.AddSwitchingStation:
-              return 40
-            case InteractionMode.AddPylon:
-              return 30
-            default:
-              return 50
-          }
-        }
 
         const size = getSizeForMode(mode, placementConfig)
         const collides = checkCollision(clickPos.x, clickPos.y, size, components, undefined, placementBuffer)
@@ -438,43 +352,4 @@ export const GridCanvas = ({
       </ReactFlow>
     </div>
   )
-}
-
-// Helper function to determine node type from component
-const getNodeType = (component: Component): string => {
-  if ('type' in component && 'capacity' in component && 'currentOutput' in component) {
-    return 'powerPlant'
-  }
-  if ('name' in component && 'size' in component) {
-    return 'city'
-  }
-  if ('voltageIn' in component && 'voltageOut' in component) {
-    return 'substation'
-  }
-  if ('maxLines' in component && !('breakers' in component)) {
-    return 'pylon'
-  }
-  if ('connectedLines' in component && 'breakers' in component) {
-    return 'switchingStation'
-  }
-  return 'default'
-}
-
-const getPlacementLabel = (mode: InteractionMode, config: PlacementConfig): string => {
-  if (mode === InteractionMode.AddPowerPlant) {
-    return config.plantType
-  }
-  if (mode === InteractionMode.AddCity) {
-    return config.citySize
-  }
-  if (mode === InteractionMode.AddSubstation) {
-    return config.substationType === SubstationType.Grid ? 'Grid Sub' : 'Zone Sub'
-  }
-  if (mode === InteractionMode.AddSwitchingStation) {
-    return 'Switching'
-  }
-  if (mode === InteractionMode.AddPylon) {
-    return 'Pylon'
-  }
-  return 'Component'
 }

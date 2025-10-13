@@ -7,8 +7,9 @@ import { GridCanvas } from './ui/components/canvas'
 import { ComponentDetailsPanel, GridStatusPanel, TimeControlPanel } from './ui/components/panels'
 import { ModeSwitcher, BuildMenu } from './ui/components/toolbar'
 import { ErrorToast } from './ui/components/ErrorToast'
-import { useInteractionMode, useComponentPlacement, useLinePlacement, createTransmissionLine } from './ui/hooks'
+import { useInteractionMode, useComponentPlacement, useLinePlacement } from './ui/hooks'
 import { checkCollision, getComponentSize } from './ui/utils/placement'
+import { createTransmissionLine } from './utils/lineFactory'
 import {
   mockPowerPlants,
   mockCities,

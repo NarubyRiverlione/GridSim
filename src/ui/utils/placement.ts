@@ -3,7 +3,7 @@
  */
 
 import type { Component } from '@/types'
-import { CitySize, SubstationType } from '@/types'
+import { getComponentSize as getComponentSizeUtil } from '@/utils/componentUtils'
 
 export const GRID_SIZE = 50
 
@@ -26,42 +26,9 @@ export const snapPointToGrid = (x: number, y: number): { x: number; y: number } 
 
 /**
  * Gets the bounding box size for a component
+ * Re-export from componentUtils for backward compatibility
  */
-export const getComponentSize = (component: Component | { type: string; size?: CitySize }): number => {
-  // Power plant
-  if ('type' in component && 'capacity' in component && 'currentOutput' in component) {
-    return 80
-  }
-
-  // City - check size
-  if ('size' in component) {
-    const citySize = component.size
-    if (citySize === CitySize.MajorMetro) return 80
-    if (citySize === CitySize.LargeCity) return 70
-    if (citySize === CitySize.MediumCity) return 60
-    if (citySize === CitySize.SmallTown) return 50
-  }
-
-  // Substation
-  if ('voltageIn' in component && 'voltageOut' in component) {
-    const substation = component
-    // Grid substation is larger than zone substation
-    return substation.substationType === SubstationType.Grid ? 60 : 50
-  }
-
-  // Switching station
-  if ('breakers' in component && 'connectedLines' in component) {
-    return 40
-  }
-
-  // Pylon
-  if ('maxLines' in component && !('breakers' in component)) {
-    return 30
-  }
-
-  // Default fallback
-  return 50
-}
+export const getComponentSize = getComponentSizeUtil
 
 /**
  * Checks if two bounding boxes overlap

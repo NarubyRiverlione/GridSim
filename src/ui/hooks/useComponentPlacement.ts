@@ -3,9 +3,17 @@
  */
 
 import { useState, useCallback, useEffect } from 'react'
-import type { Component, PowerPlant, City, Substation, SwitchingStation, Pylon, Point } from '@/types'
-import { InteractionMode, PlantType, CitySize, SubstationType, VoltageLevel, ComponentState } from '@/types'
+import type { Component, Point } from '@/types'
+import { InteractionMode, PlantType, CitySize, SubstationType } from '@/types'
 import { snapPointToGrid, isValidPlacement } from '../utils/placement'
+import { getComponentSize } from '@/utils/componentUtils'
+import {
+  createPowerPlant,
+  createCity,
+  createSubstation,
+  createSwitchingStation,
+  createPylon,
+} from '@/utils/componentFactory'
 
 export interface PlacementConfig {
   plantType: PlantType
@@ -168,18 +176,16 @@ export const useComponentPlacement = ({
   }
 }
 
+/**
+ * Get component size for mode - uses getComponentSize from componentUtils
+ */
 const getComponentSizeForMode = (mode: InteractionMode, config: PlacementConfig): number => {
+  // Create a mock component object for size calculation
   switch (mode) {
     case InteractionMode.AddPowerPlant:
       return 80
-    case InteractionMode.AddCity: {
-      const citySize = config.citySize
-      if (citySize === CitySize.MajorMetro) return 80
-      if (citySize === CitySize.LargeCity) return 70
-      if (citySize === CitySize.MediumCity) return 60
-      if (citySize === CitySize.SmallTown) return 50
-      return 50
-    }
+    case InteractionMode.AddCity:
+      return getComponentSize({ type: 'city', size: config.citySize })
     case InteractionMode.AddSubstation:
       return config.substationType === SubstationType.Grid ? 60 : 50
     case InteractionMode.AddSwitchingStation:
@@ -191,134 +197,22 @@ const getComponentSizeForMode = (mode: InteractionMode, config: PlacementConfig)
   }
 }
 
-let componentIdCounter = 1000
-
+/**
+ * Create component based on mode and configuration
+ */
 const createComponentForMode = (mode: InteractionMode, position: Point, config: PlacementConfig): Component | null => {
-  const id = `${mode}-${componentIdCounter++}`
-
   switch (mode) {
     case InteractionMode.AddPowerPlant:
-      return createPowerPlant(id, position, config.plantType)
+      return createPowerPlant(position, config.plantType)
     case InteractionMode.AddCity:
-      return createCity(id, position, config.citySize)
+      return createCity(position, config.citySize)
     case InteractionMode.AddSubstation:
-      return createSubstation(id, position, config.substationType)
+      return createSubstation(position, config.substationType)
     case InteractionMode.AddSwitchingStation:
-      return createSwitchingStation(id, position)
+      return createSwitchingStation(position)
     case InteractionMode.AddPylon:
-      return createPylon(id, position)
+      return createPylon(position)
     default:
       return null
-  }
-}
-
-const createPowerPlant = (id: string, location: Point, type: PlantType): PowerPlant => {
-  const specs = getPowerPlantSpecs(type)
-  return {
-    id,
-    type,
-    location,
-    capacity: specs.capacity,
-    currentOutput: 0,
-    buildCost: specs.buildCost,
-    rampRate: specs.rampRate,
-    state: ComponentState.Healthy,
-  }
-}
-
-const createCity = (id: string, location: Point, size: CitySize): City => {
-  const specs = getCitySpecs(size)
-  return {
-    id,
-    name: specs.name,
-    size,
-    location,
-    baseDemand: specs.baseDemand,
-    currentDemand: specs.baseDemand,
-    powerReceived: 0,
-    connected: false,
-    state: ComponentState.Disconnected,
-  }
-}
-
-const createSubstation = (id: string, location: Point, substationType: SubstationType): Substation => {
-  const isGrid = substationType === SubstationType.Grid
-  return {
-    id,
-    location,
-    substationType,
-    voltageIn: isGrid ? VoltageLevel.KV400 : VoltageLevel.KV220,
-    voltageOut: isGrid ? VoltageLevel.KV220 : VoltageLevel.KV110,
-    capacity: isGrid ? 2000 : 800,
-    currentLoad: 0,
-    losses: isGrid ? 1.5 : 1.2,
-    breakers: [
-      { id: `${id}-breaker-1`, closed: true, tripped: false },
-      { id: `${id}-breaker-2`, closed: true, tripped: false },
-    ],
-    state: ComponentState.Healthy,
-  }
-}
-
-const createSwitchingStation = (id: string, location: Point): SwitchingStation => {
-  return {
-    id,
-    location,
-    breakers: [
-      { id: `${id}-breaker-1`, closed: true, tripped: false },
-      { id: `${id}-breaker-2`, closed: true, tripped: false },
-    ],
-    connectedLines: [],
-    state: ComponentState.Healthy,
-  }
-}
-
-const createPylon = (id: string, location: Point): Pylon => {
-  return {
-    id,
-    location,
-    maxLines: 4,
-    connectedLines: [],
-    state: ComponentState.Healthy,
-  }
-}
-
-const getPowerPlantSpecs = (type: PlantType): { capacity: number; buildCost: number; rampRate: number } => {
-  switch (type) {
-    case PlantType.Nuclear:
-      return { capacity: 1000, buildCost: 5_000_000_000, rampRate: 10 }
-    case PlantType.Coal:
-      return { capacity: 800, buildCost: 1_500_000_000, rampRate: 30 }
-    case PlantType.CCGT:
-      return { capacity: 600, buildCost: 1_000_000_000, rampRate: 50 }
-    case PlantType.Hydro:
-      return { capacity: 400, buildCost: 800_000_000, rampRate: 100 }
-    case PlantType.WindOffshore:
-      return { capacity: 800, buildCost: 2_000_000_000, rampRate: 0 }
-    case PlantType.WindOnshore:
-      return { capacity: 300, buildCost: 600_000_000, rampRate: 0 }
-    case PlantType.Solar:
-      return { capacity: 200, buildCost: 400_000_000, rampRate: 0 }
-    default:
-      return { capacity: 500, buildCost: 1_000_000_000, rampRate: 50 }
-  }
-}
-
-const getCitySpecs = (size: CitySize): { name: string; baseDemand: number } => {
-  const cityNames = ['Newtown', 'Springfield', 'Riverside', 'Hillside', 'Lakeside', 'Parkville']
-  const randomIndex = Math.floor(Math.random() * cityNames.length)
-  const randomName = cityNames[randomIndex] ?? 'Newtown'
-
-  switch (size) {
-    case CitySize.SmallTown:
-      return { name: randomName, baseDemand: 35 }
-    case CitySize.MediumCity:
-      return { name: randomName, baseDemand: 150 }
-    case CitySize.LargeCity:
-      return { name: randomName, baseDemand: 650 }
-    case CitySize.MajorMetro:
-      return { name: randomName, baseDemand: 3000 }
-    default:
-      return { name: randomName, baseDemand: 100 }
   }
 }
