@@ -12,12 +12,13 @@ interface TimeControlPanelProps {
 
 export const TimeControlPanel = ({ gridState }: TimeControlPanelProps): React.ReactElement => {
   const formatDate = (date: Date): string => {
-    return new Intl.DateTimeFormat('en-EU', {
+    return new Intl.DateTimeFormat('en-GB', {
       year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
+      hour12: false,
     }).format(date)
   }
 
