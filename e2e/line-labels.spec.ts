@@ -4,7 +4,7 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Transmission line label visibility', () => {
   test('labels hidden by default and appear on hover', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=complex')
     await page.waitForSelector('.react-flow__node', { timeout: 5000 })
 
     // Ensure there's at least one transmission line. If none, create a simple one programmatically

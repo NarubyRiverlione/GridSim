@@ -7,7 +7,7 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Visual Regression', () => {
   test('should match the full application layout', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=complex')
 
     // Wait for all content to load
     await page.waitForSelector('.react-flow__node', { timeout: 5000 })
@@ -21,7 +21,7 @@ test.describe('Visual Regression', () => {
   })
 
   test('should match the grid canvas area', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=complex')
 
     // Wait for canvas to load
     await page.waitForSelector('.react-flow', { timeout: 5000 })
@@ -35,7 +35,7 @@ test.describe('Visual Regression', () => {
   })
 
   test('should match the sidebar panels', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=complex')
 
     // Wait for panels to load
     await page.waitForSelector('.sidebar-left', { timeout: 5000 })
@@ -49,7 +49,7 @@ test.describe('Visual Regression', () => {
   })
 
   test('should match mode switcher toolbar', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=complex')
 
     // Wait for toolbar to load
     await page.waitForSelector('.mode-switcher', { timeout: 5000 })
@@ -60,7 +60,7 @@ test.describe('Visual Regression', () => {
   })
 
   test('should match active mode state', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=complex')
 
     // Wait for toolbar to load
     await page.waitForSelector('.mode-switcher', { timeout: 5000 })
@@ -76,7 +76,7 @@ test.describe('Visual Regression', () => {
   })
 
   test('should match component details panel with selection', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=complex')
 
     // Wait for nodes and select one
     await page.waitForSelector('.plant-node', { timeout: 5000 })

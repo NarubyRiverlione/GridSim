@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Collision Detection', () => {
   test('should block placement on occupied cell and block overlapping drag', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=complex')
     await page.waitForSelector('.react-flow__node', { timeout: 5000 })
 
     // Count initial nodes

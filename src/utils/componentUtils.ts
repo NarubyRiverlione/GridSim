@@ -60,7 +60,7 @@ export const getComponentSize = (component: Component | { type: string; size?: C
 
   // Substation
   if ('voltageIn' in component && 'voltageOut' in component) {
-    const substation = component as Substation
+    const substation = component
     return substation.substationType === SubstationType.Grid ? 60 : 50
   }
 

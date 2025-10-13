@@ -38,12 +38,7 @@ export const linesToEdges = (transmissionLines: TransmissionLine[]): Edge[] => {
 /**
  * Create a ghost node for placement preview
  */
-export const createGhostNode = (
-  position: Point,
-  isValid: boolean,
-  size: number,
-  label: string
-): Node => {
+export const createGhostNode = (position: Point, isValid: boolean, size: number, label: string): Node => {
   return {
     id: GHOST_NODE_ID,
     type: 'ghost',

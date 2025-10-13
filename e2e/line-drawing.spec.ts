@@ -6,7 +6,7 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Line Drawing System', () => {
   test('should switch to line drawing mode', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=complex')
     await page.waitForSelector('.mode-switcher', { timeout: 5000 })
 
     // Click line mode button
@@ -18,7 +18,7 @@ test.describe('Line Drawing System', () => {
   })
 
   test('should draw line between pylon and switching station', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=complex')
     await page.waitForSelector('.react-flow__edge', { timeout: 5000 })
     const initialCount = await page.locator('.react-flow__edge').count()
     const lineButton = page.locator('button:has-text("Line")')
@@ -41,7 +41,7 @@ test.describe('Line Drawing System', () => {
   })
 
   test('should show preview line when drawing', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=complex')
     await page.waitForSelector('.react-flow__node', { timeout: 5000 })
 
     // Switch to line drawing mode
@@ -61,7 +61,7 @@ test.describe('Line Drawing System', () => {
   })
 
   test('should handle city to city connection attempt', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=complex')
     await page.waitForSelector('.city-node', { timeout: 5000 })
     const cityCount = await page.locator('.city-node').count()
     if (cityCount < 2) {
@@ -94,7 +94,7 @@ test.describe('Line Drawing System', () => {
   })
 
   test('should prevent duplicate lines', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=complex')
     await page.waitForSelector('.react-flow__node', { timeout: 5000 })
     const initialCount = await page.locator('.react-flow__edge').count()
     const lineButton = page.locator('button:has-text("Line")')
@@ -125,7 +125,7 @@ test.describe('Line Drawing System', () => {
   })
 
   test('should cancel line drawing when clicking pane', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=complex')
     await page.waitForSelector('.react-flow__node', { timeout: 5000 })
 
     // Switch to line drawing mode
@@ -149,7 +149,7 @@ test.describe('Line Drawing System', () => {
   })
 
   test('should connect power plant to pylon', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=complex')
     await page.waitForSelector('.react-flow__node', { timeout: 5000 })
     const initialCount = await page.locator('.react-flow__edge').count()
     const lineButton = page.locator('button:has-text("Line")')
@@ -170,14 +170,14 @@ test.describe('Line Drawing System', () => {
   })
 
   test('should display default details panel text', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=complex')
     await page.waitForSelector('.details-panel', { timeout: 5000 })
     const detailsPanel = page.locator('.details-panel')
     await expect(detailsPanel).toContainText('Select a component to view details', { timeout: 5000 })
   })
 
   test('should switch back to select mode after drawing line', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=complex')
     await page.waitForSelector('.react-flow__node', { timeout: 5000 })
 
     // Switch to line drawing mode
@@ -205,7 +205,7 @@ test.describe('Line Drawing System', () => {
 
   // New tests for direct component connections (voltage cascade)
   test('should connect power plant to grid substation (400kV)', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=complex')
     await page.waitForSelector('.react-flow__node', { timeout: 5000 })
 
     const initialCount = await page.locator('.react-flow__edge').count()
@@ -237,7 +237,7 @@ test.describe('Line Drawing System', () => {
   })
 
   test('should connect grid substation to zone substation (220kV)', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=complex')
     await page.waitForSelector('.react-flow__node', { timeout: 5000 })
 
     const initialCount = await page.locator('.react-flow__edge').count()
@@ -269,7 +269,7 @@ test.describe('Line Drawing System', () => {
   })
 
   test('should connect zone substation to city (110kV)', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=complex')
     await page.waitForSelector('.react-flow__node', { timeout: 5000 })
 
     const initialCount = await page.locator('.react-flow__edge').count()
@@ -304,7 +304,7 @@ test.describe('Line Drawing System', () => {
   })
 
   test('should show error for invalid voltage connection (power plant to city)', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=complex')
     await page.waitForSelector('.react-flow__node', { timeout: 5000 })
 
     // Switch to line drawing mode
@@ -328,7 +328,7 @@ test.describe('Line Drawing System', () => {
   })
 
   test('should show error for wrong direction substation connection', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=complex')
     await page.waitForSelector('.react-flow__node', { timeout: 5000 })
 
     // Switch to line drawing mode

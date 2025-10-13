@@ -6,7 +6,7 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Node Move', () => {
   test('should drag a power plant node to a new position', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=complex')
     await page.waitForSelector('.plant-node', { timeout: 5000 })
 
     // Get initial position of the node

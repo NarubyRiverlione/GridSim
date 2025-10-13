@@ -10,7 +10,16 @@ import { ErrorToast } from './ui/components/ErrorToast'
 import { useInteractionMode, useComponentPlacement, useLinePlacement } from './ui/hooks'
 import { checkCollision, getComponentSize } from './ui/utils/placement'
 import { createTransmissionLine } from './utils/lineFactory'
-import {
+import * as simpleMockData from './data/mockData.simple'
+import * as complexMockData from './data/mockData.complex'
+import type { Component, TransmissionLine } from './types'
+import './App.css'
+
+// Check if complex mock data should be loaded via query parameter
+const useComplexMockData = new URLSearchParams(window.location.search).get('mockData') === 'complex'
+const mockData = useComplexMockData ? complexMockData : simpleMockData
+
+const {
   mockPowerPlants,
   mockCities,
   mockTransmissionLines,
@@ -18,9 +27,7 @@ import {
   mockSwitchingStations,
   mockPylons,
   mockGridState,
-} from './data/mockData'
-import type { Component, TransmissionLine } from './types'
-import './App.css'
+} = mockData
 
 export const App = (): React.ReactElement => {
   const { mode, setMode } = useInteractionMode()

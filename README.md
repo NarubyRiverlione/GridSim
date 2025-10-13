@@ -239,14 +239,31 @@ Comprehensive end-to-end tests covering:
 
 - `e2e/app.spec.ts` - Core application functionality
 
-## Recent progress (Phase 0)
+## Recent Progress (Phase 0)
 
-- Placement fixes: the ghost preview is now cleared after a confirmed placement and the placement flow was hardened so tests that click without prior hover still succeed. See `src/ui/hooks/useComponentPlacement.ts` and `src/ui/components/canvas/GridCanvas.tsx`.
-- Performance: mouse-move updates are batched via requestAnimationFrame and there are shallow-equality guards to avoid no-op setNodes/setEdges updates. This significantly reduces edge re-renders during pointer movement.
-- UX: edge label elements no longer intercept pointer events (use `pointer-events: none`) to prevent hover flicker; labels are shown on hover/select by default.
-- E2E: placement-related Playwright specs pass locally after the fixes. Additional e2e tests (console-capture, label-visibility toggle) remain planned.
-- `e2e/interactions.spec.ts` - User interactions and component selection
-- `e2e/visual.spec.ts` - Visual regression tests
+**Latest Updates (2025-01-13):**
+
+- **Enhanced E2E Test Suite**: Comprehensive line drawing tests with voltage cascade coverage (14 tests for 400kV→220kV→110kV connections) - see commit b43e5ea, e61ef91
+- **Code Refactoring**: Created 7 utility modules for better separation of concerns, reducing file sizes by 26-73% - see commit 15b5d34
+- **UI Improvements**: 24-hour time format (DD/MM/YYYY), moved placement buffer control below details panel - see commits aaede94, 536ce85
+- **CI/CD Ready**: Playwright configured for automated pipelines (no auto-open server) - see commit b11b39e
+- **Test Coverage**: 4 unit tests (Vitest), 59 E2E tests (Playwright) - 58 passing, 1 skipped
+- **Performance**: RAF-batched mouse-move updates, shallow-equality guards to reduce edge re-renders
+- **UX Polish**: Edge labels with `pointer-events: none` to prevent hover flicker
+
+**Phase 0 Status**: ✅ **SUBSTANTIALLY COMPLETE** - All 7 success criteria met. See [docs/phase-0_status.md](./docs/phase-0_status.md) for comprehensive project status.
+
+**E2E Test Suites:**
+
+- `e2e/app.spec.ts` - Core application functionality (19 tests)
+- `e2e/interactions.spec.ts` - User interactions and component selection (9 tests)
+- `e2e/placement.spec.ts` - Snap-to-grid and placement (7 tests)
+- `e2e/collision.spec.ts` - Collision detection (4 tests)
+- `e2e/visual.spec.ts` - Visual regression tests (3 tests)
+- `e2e/line-drawing.spec.ts` - Transmission line drawing with voltage cascade (14 tests)
+- `e2e/line-labels.spec.ts` - Edge label hover behavior (3 tests)
+- `e2e/node-move.spec.ts` - Drag and drop persistence (3 tests)
+- `e2e/edge-render-debug.spec.ts` - Performance debugging (1 test, skipped)
 
 See [E2E_TESTING.md](./E2E_TESTING.md) for detailed testing guide.
 

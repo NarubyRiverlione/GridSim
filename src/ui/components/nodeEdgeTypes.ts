@@ -2,12 +2,12 @@ import type { NodeTypes, EdgeTypes } from 'reactflow'
 import { CityNode, PowerPlantNode, SubstationNode, SwitchingStationNode, PylonNode, GhostNode } from './nodes'
 import { TransmissionLineEdge } from './edges'
 
-/**
+/*
  * Ensure node/edge type objects are stable across HMR by attaching them to globalThis.
  * Provide typed accessors (getNodeTypes / getEdgeTypes) so callers receive a stable reference.
  */
 
-/* global augmentation so TypeScript knows these globals exist on globalThis */
+// global augmentation so TypeScript knows these globals exist on globalThis
 declare global {
   var __GRIDSIM_NODE_TYPES: NodeTypes | undefined
   var __GRIDSIM_EDGE_TYPES: EdgeTypes | undefined
@@ -24,7 +24,7 @@ export function getNodeTypes(): NodeTypes {
     ghost: GhostNode,
   } as NodeTypes
 
-  return globalThis.__GRIDSIM_NODE_TYPES as NodeTypes
+  return globalThis.__GRIDSIM_NODE_TYPES
 }
 
 export function getEdgeTypes(): EdgeTypes {
@@ -32,5 +32,5 @@ export function getEdgeTypes(): EdgeTypes {
     transmission: TransmissionLineEdge,
   } as EdgeTypes
 
-  return globalThis.__GRIDSIM_EDGE_TYPES as EdgeTypes
+  return globalThis.__GRIDSIM_EDGE_TYPES
 }
