@@ -8,11 +8,13 @@ These mechanics govern how components are placed and positioned on the canvas du
 
 **Persistent Node Movement (Drag-and-Drop):**
 
-- [ ] Implement `onNodeDragStop` handler in `GridCanvas` to update node position in app state
-- [ ] Pass `onNodeDragStop` to React Flow
-- [ ] Update the corresponding component's `location` in state arrays (`powerPlants`, `cities`, etc.) in `App.tsx` when a node is moved
-- [ ] Ensure node position persists after drag and does not snap back
-- [ ] Maintain snap-to-grid and collision detection during movement
+**Collision Detection Improvements (priority):**
+
+- [ ] Harden collision detection so components cannot overlap during placement or after drag
+  - [ ] Enforce bounding-box checks on placement and on drag-stop
+  - [ ] Add optional buffer-zone enforcement (configurable, default 0 or 10px)
+  - [ ] Add visual preview and tooltip when placement is blocked
+  - [ ] Add unit/e2e tests to assert no-overlap behavior during placement/drag
 
 ---
 
@@ -60,6 +62,8 @@ Component placed at (100, 450)
 - **Bounding Box**: Each component type has defined size (e.g., power plant = 80×80px, city = 60×60px)
 - **Buffer Zone**: Optional padding around components (e.g., 10px margin)
 
+Note: current implementation enforces snap-to-grid and basic overlap checks in many cases, but there are gaps — it's still possible to place nodes overlapping each other in some workflows. See "Collision Detection Improvements" above for concrete follow-up work.
+
 **Visual Feedback:**
 
 ```
@@ -78,8 +82,9 @@ Invalid placement (collision detected):
 
 - **While Dragging**: Component follows cursor with snap-to-grid
 - **Collision Check**: Every grid position checked for existing components
-- **Invalid Drop**: If released on occupied position, component snaps back to original location
-- **Valid Drop**: Component snaps to new grid position
+- **Collision Check**: Intended to check every grid position for existing components; current checks are basic and may miss some overlap cases
+- **Invalid Drop (intended)**: If released on occupied position, component should snap back to original location (or block placement). This behavior is not fully enforced in all cases yet.
+- **Valid Drop**: Component snaps to new grid position and position persists (implemented)
 
 ### Line Crossing Rules (Phase 0 - Visual Only)
 
@@ -176,9 +181,9 @@ Invalid placement (collision detected):
 **Implemented (Phase 0):**
 
 - ✅ Snap-to-grid for all component placements
-- ✅ Node collision detection (prevent overlap)
-- ✅ Visual feedback (green/red outlines)
-- ✅ Drag-and-drop with collision checking
+- ⚠️ Node collision detection — partial (overlap can still occur in some flows)
+- ✅ Visual feedback (green/red outlines) in many flows
+- ✅ Drag-and-drop with collision checking and persistent positions (drag persistence implemented)
 - ✅ Component size bounding boxes
 - ✅ Canvas boundary constraints
 

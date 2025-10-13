@@ -14,9 +14,11 @@ interface BuildMenuProps {
   onPlantTypeChange: (type: PlantType) => void
   onCitySizeChange: (size: CitySize) => void
   onSubstationTypeChange: (type: SubstationType) => void
+  placementBuffer: number
+  onPlacementBufferChange: (v: number) => void
 }
 
-export const BuildMenu = ({
+const BuildMenuInner = ({
   currentMode,
   selectedPlantType,
   selectedCitySize,
@@ -24,7 +26,7 @@ export const BuildMenu = ({
   onPlantTypeChange,
   onCitySizeChange,
   onSubstationTypeChange,
-}: BuildMenuProps): React.ReactElement => {
+}: Omit<BuildMenuProps, 'placementBuffer' | 'onPlacementBufferChange'>): React.ReactElement => {
   if (currentMode === InteractionMode.AddPowerPlant) {
     return (
       <div className="build-menu">
@@ -95,6 +97,40 @@ export const BuildMenu = ({
 
   return <div className="build-menu" style={{ display: 'none' }} />
 }
+
+// Small numeric control for buffer (px)
+const BufferControl = ({ value, onChange }: { value: number; onChange: (v: number) => void }): React.ReactElement => {
+  return (
+    <div className="build-menu">
+      <h3 className="build-menu-title">Placement Buffer</h3>
+      <div className="build-menu-options">
+        <input
+          aria-label="placement-buffer"
+          type="range"
+          min={0}
+          max={40}
+          value={value}
+          onChange={e => onChange(Number(e.target.value))}
+        />
+        <div style={{ fontSize: 12, marginTop: 6 }}>Buffer: {value}px</div>
+      </div>
+    </div>
+  )
+}
+
+// Render BufferControl always below mode-specific options to allow changing buffer globally
+// (keeps UI changes small for Phase 0)
+const BuildMenuWrapper = (props: BuildMenuProps): React.ReactElement => {
+  const main = BuildMenuInner(props)
+  return (
+    <div>
+      {main}
+      <BufferControl value={props.placementBuffer} onChange={props.onPlacementBufferChange} />
+    </div>
+  )
+}
+
+export const BuildMenu = BuildMenuWrapper
 
 const formatPlantType = (type: PlantType): string => {
   const typeMap: Record<PlantType, string> = {

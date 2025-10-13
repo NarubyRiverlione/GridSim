@@ -32,7 +32,7 @@ export const GridStatusPanel = ({ gridState }: GridStatusPanelProps): React.Reac
           <span className="status-value">{formatCurrency(budget)}</span>
         </div>
 
-        <div className="status-item happiness-item">
+        <div className="status-item ">
           <span className="status-label">Happiness</span>
           <div className="happiness-bar-container">
             <div

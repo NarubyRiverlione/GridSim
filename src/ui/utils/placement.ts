@@ -72,10 +72,11 @@ export const checkBoundingBoxOverlap = (
   size1: number,
   x2: number,
   y2: number,
-  size2: number
+  size2: number,
+  buffer = 0
 ): boolean => {
-  const halfSize1 = size1 / 2
-  const halfSize2 = size2 / 2
+  const halfSize1 = size1 / 2 + buffer
+  const halfSize2 = size2 / 2 + buffer
 
   return (
     x1 - halfSize1 < x2 + halfSize2 &&
@@ -93,7 +94,8 @@ export const checkCollision = (
   y: number,
   componentSize: number,
   existingComponents: Component[],
-  excludeId?: string
+  excludeId?: string,
+  buffer = 0
 ): boolean => {
   return existingComponents.some(existing => {
     if (excludeId !== undefined && existing.id === excludeId) {
@@ -101,7 +103,7 @@ export const checkCollision = (
     }
 
     const existingSize = getComponentSize(existing)
-    return checkBoundingBoxOverlap(x, y, componentSize, existing.location.x, existing.location.y, existingSize)
+    return checkBoundingBoxOverlap(x, y, componentSize, existing.location.x, existing.location.y, existingSize, buffer)
   })
 }
 
@@ -112,7 +114,8 @@ export const isValidPlacement = (
   x: number,
   y: number,
   componentSize: number,
-  existingComponents: Component[]
+  existingComponents: Component[],
+  buffer = 0
 ): boolean => {
-  return !checkCollision(x, y, componentSize, existingComponents)
+  return !checkCollision(x, y, componentSize, existingComponents, undefined, buffer)
 }

@@ -1,9 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(do sed -i '' \"1,/^import/s/^import/import React from ''react''\\nimport/\" \"$file\")",
       "Bash(pnpm exec playwright:*)",
-      "Bash(pnpm test:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git merge:*)",

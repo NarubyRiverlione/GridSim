@@ -33,11 +33,13 @@ export interface UseComponentPlacementReturn {
 interface UseComponentPlacementProps {
   mode: InteractionMode
   existingComponents: Component[]
+  placementBuffer?: number
 }
 
 export const useComponentPlacement = ({
   mode,
   existingComponents,
+  placementBuffer = 10,
 }: UseComponentPlacementProps): UseComponentPlacementReturn => {
   const [placementConfig, setPlacementConfig] = useState<PlacementConfig>({
     plantType: PlantType.Nuclear,
@@ -51,12 +53,20 @@ export const useComponentPlacement = ({
     isValidPosition: false,
   })
 
+  const resetPlacement = useCallback((): void => {
+    setPlacementState({
+      isPlacing: false,
+      ghostPosition: null,
+      isValidPosition: false,
+    })
+  }, [])
+
   // Reset placement when mode changes to Select
   useEffect(() => {
     if (mode === InteractionMode.Select) {
       resetPlacement()
     }
-  }, [mode])
+  }, [mode, resetPlacement])
 
   const setPlantType = useCallback((type: PlantType): void => {
     setPlacementConfig(prev => ({ ...prev, plantType: type }))
@@ -68,14 +78,6 @@ export const useComponentPlacement = ({
 
   const setSubstationType = useCallback((type: SubstationType): void => {
     setPlacementConfig(prev => ({ ...prev, substationType: type }))
-  }, [])
-
-  const resetPlacement = useCallback((): void => {
-    setPlacementState({
-      isPlacing: false,
-      ghostPosition: null,
-      isValidPosition: false,
-    })
   }, [])
 
   const handleMouseMove = useCallback(
@@ -95,7 +97,8 @@ export const useComponentPlacement = ({
 
       const snappedPos = snapPointToGrid(x, y)
       const componentSize = getComponentSizeForMode(mode, placementConfig)
-      const isValid = isValidPlacement(snappedPos.x, snappedPos.y, componentSize, existingComponents)
+      const buffer = placementBuffer
+      const isValid = isValidPlacement(snappedPos.x, snappedPos.y, componentSize, existingComponents, buffer)
 
       setPlacementState({
         isPlacing: true,
@@ -103,14 +106,15 @@ export const useComponentPlacement = ({
         isValidPosition: isValid,
       })
     },
-    [mode, placementConfig, existingComponents, resetPlacement]
+    [mode, placementConfig, existingComponents, resetPlacement, placementBuffer]
   )
 
   const handleClick = useCallback(
     (x: number, y: number): Component | null => {
       const snappedPos = snapPointToGrid(x, y)
       const componentSize = getComponentSizeForMode(mode, placementConfig)
-      const isValid = isValidPlacement(snappedPos.x, snappedPos.y, componentSize, existingComponents)
+      const buffer = placementBuffer
+      const isValid = isValidPlacement(snappedPos.x, snappedPos.y, componentSize, existingComponents, buffer)
 
       if (!isValid) {
         return null
@@ -120,7 +124,7 @@ export const useComponentPlacement = ({
       const newComponent = createComponentForMode(mode, snappedPos, placementConfig)
       return newComponent
     },
-    [mode, placementConfig, existingComponents]
+    [mode, placementConfig, existingComponents, placementBuffer]
   )
 
   return {

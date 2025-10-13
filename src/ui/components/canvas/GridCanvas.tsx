@@ -18,7 +18,7 @@ import 'reactflow/dist/style.css'
 import { Component, TransmissionLine, InteractionMode, SubstationType } from '@/types'
 import type { PlacementState, PlacementConfig } from '@/ui/hooks/useComponentPlacement'
 import type { LineDrawingState } from '@/ui/hooks/useLinePlacement'
-import { getComponentSize } from '@/ui/utils/placement'
+import { getComponentSize, checkCollision, snapPointToGrid } from '@/ui/utils/placement'
 import './CanvasStyles.css'
 import { getNodeTypes, getEdgeTypes } from '../nodeEdgeTypes'
 
@@ -40,6 +40,9 @@ interface GridCanvasProps {
   onNodeClickForLine: (node: Component) => void
   onMouseMoveForLine: (x: number, y: number) => void
   onLineAdd: (source: Component, target: Component) => void
+  onNodeDragStop?: (id: string, x: number, y: number) => void
+  onPlacementBlocked?: (message: string) => void
+  placementBuffer?: number
 }
 
 const GHOST_NODE_ID = 'ghost-preview-node'
@@ -58,6 +61,9 @@ export const GridCanvas = ({
   onNodeClickForLine,
   onMouseMoveForLine,
   onLineAdd,
+  onNodeDragStop,
+  onPlacementBlocked,
+  placementBuffer = 10,
 }: GridCanvasProps): React.ReactElement => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null)
   const { screenToFlowPosition } = useReactFlow()
@@ -127,6 +133,31 @@ export const GridCanvas = ({
 
       const component = node.data as Component
 
+      // If in placement mode, treat clicking a node as an attempt to place at its location
+      const isPlacementMode =
+        mode === InteractionMode.AddPowerPlant ||
+        mode === InteractionMode.AddCity ||
+        mode === InteractionMode.AddSubstation ||
+        mode === InteractionMode.AddSwitchingStation ||
+        mode === InteractionMode.AddPylon
+
+      if (isPlacementMode) {
+        // Use the node's canonical location for placement attempt
+        const placeX = component.location.x
+        const placeY = component.location.y
+        const size = getComponentSize({ type: mode, ...placementConfig })
+        const collides = checkCollision(placeX, placeY, size, components, undefined, placementBuffer)
+        if (collides) {
+          if (typeof onPlacementBlocked === 'function') onPlacementBlocked('Placement blocked: space occupied')
+          return
+        }
+
+        // If allowed, create the component via placement click
+        const newComponent = onPlacementClick(placeX, placeY)
+        if (newComponent !== null) onComponentAdd(newComponent)
+        return
+      }
+
       // If in line drawing mode, handle line placement
       if (mode === InteractionMode.AddTransmissionLine) {
         // If completing a line (second click), create it first
@@ -141,7 +172,19 @@ export const GridCanvas = ({
         onComponentSelect(component)
       }
     },
-    [mode, onComponentSelect, onNodeClickForLine, lineDrawingState, onLineAdd]
+    [
+      mode,
+      onComponentSelect,
+      onNodeClickForLine,
+      lineDrawingState,
+      onLineAdd,
+      placementConfig,
+      onPlacementClick,
+      onComponentAdd,
+      components,
+      onPlacementBlocked,
+      placementBuffer,
+    ]
   )
 
   // Handle edge selection
@@ -153,18 +196,71 @@ export const GridCanvas = ({
   )
 
   // Handle pane click (deselect or place component)
-  const handlePaneClick = useCallback((): void => {
-    if (placementState.isPlacing && placementState.isValidPosition && placementState.ghostPosition !== null) {
-      // Place the component
-      const newComponent = onPlacementClick(placementState.ghostPosition.x, placementState.ghostPosition.y)
-      if (newComponent !== null) {
-        onComponentAdd(newComponent)
+  const handlePaneClick = useCallback(
+    (event?: React.MouseEvent): void => {
+      if (placementState.isPlacing && placementState.ghostPosition !== null) {
+        // Compute the flow coordinates from the actual click event when available
+        const clickPos = event
+          ? screenToFlowPosition({ x: event.clientX, y: event.clientY })
+          : placementState.ghostPosition
+
+        // determine component size based on placement mode and config
+        const getSizeForMode = (m: InteractionMode, cfg: PlacementConfig): number => {
+          switch (m) {
+            case InteractionMode.AddPowerPlant:
+              return 80
+            case InteractionMode.AddCity: {
+              const citySize = cfg.citySize
+              if (citySize === undefined) return 50
+              return 60
+            }
+            case InteractionMode.AddSubstation:
+              return cfg.substationType === SubstationType.Grid ? 60 : 50
+            case InteractionMode.AddSwitchingStation:
+              return 40
+            case InteractionMode.AddPylon:
+              return 30
+            default:
+              return 50
+          }
+        }
+
+        const size = getSizeForMode(mode, placementConfig)
+        const collides = checkCollision(clickPos.x, clickPos.y, size, components, undefined, 10)
+        if (collides) {
+          if (typeof onPlacementBlocked === 'function') {
+            onPlacementBlocked('Placement blocked: space occupied')
+          }
+          return
+        }
+
+        if (placementState.isValidPosition) {
+          // Place the component using the flow coordinates
+          const newComponent = onPlacementClick(clickPos.x, clickPos.y)
+          if (newComponent !== null) {
+            onComponentAdd(newComponent)
+          }
+        }
+      } else {
+        // Deselect
+        onComponentSelect(null)
       }
-    } else {
-      // Deselect
-      onComponentSelect(null)
-    }
-  }, [placementState, onPlacementClick, onComponentAdd, onComponentSelect])
+      // placementBuffer intentionally included in deps to ensure validation uses latest value
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [
+      placementState,
+      onPlacementClick,
+      onComponentAdd,
+      onComponentSelect,
+      components,
+      mode,
+      placementConfig,
+      onPlacementBlocked,
+      screenToFlowPosition,
+      placementBuffer,
+    ]
+  )
 
   // Handle mouse move for placement preview and line drawing
   const handleMouseMove = useCallback(
@@ -192,6 +288,56 @@ export const GridCanvas = ({
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
+        onNodeDrag={(_event, node) => {
+          if (node.id === GHOST_NODE_ID) return
+          const pos = node.position as { x?: number; y?: number } | undefined
+          if (!(pos && typeof pos.x === 'number' && typeof pos.y === 'number')) return
+
+          const snapped = snapPointToGrid(pos.x, pos.y)
+          const draggedComponent = components.find(c => c.id === node.id)
+          if (!draggedComponent) return
+          const size = getComponentSize(draggedComponent)
+          const buffer = typeof placementBuffer === 'number' ? placementBuffer : 10
+          const collides = checkCollision(snapped.x, snapped.y, size, components, node.id, buffer)
+
+          // Update node data to reflect temporary invalid state while dragging
+          setNodes(prev =>
+            prev.map(n => {
+              if (n.id !== node.id) return n
+              const data = n.data as Record<string, unknown>
+              return {
+                ...n,
+                data: { ...data, isTempInvalid: collides },
+                className: collides ? 'temp-invalid' : undefined,
+              }
+            })
+          )
+        }}
+        onNodeDragStop={(_event, node) => {
+          if (node.id === GHOST_NODE_ID) return
+          const pos = node.position as { x?: number; y?: number } | undefined
+          if (!(pos && typeof pos.x === 'number' && typeof pos.y === 'number')) return
+
+          // Snap to grid for final position
+          const snapped = snapPointToGrid(pos.x, pos.y)
+
+          // Find the component being dragged to compute its size
+          const draggedComponent = components.find(c => c.id === node.id)
+
+          if (draggedComponent) {
+            const size = getComponentSize(draggedComponent)
+            const collides = checkCollision(snapped.x, snapped.y, size, components, node.id, placementBuffer)
+            if (collides) {
+              // Revert visual position by resetting nodes to canonical component positions
+              setNodes(componentNodes)
+              return
+            }
+          }
+
+          if (typeof onNodeDragStop === 'function') {
+            onNodeDragStop(node.id, snapped.x, snapped.y)
+          }
+        }}
         onNodeClick={handleNodeClick}
         onEdgeClick={handleEdgeClick}
         onPaneClick={handlePaneClick}

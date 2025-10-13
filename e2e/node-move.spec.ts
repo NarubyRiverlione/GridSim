@@ -35,13 +35,17 @@ test.describe('Node Move', () => {
       expect(newBox.y).toBeGreaterThan(initialBox.y)
     }
 
-    // Wait longer to allow snap-back
+    // Wait longer to allow persistence to be applied
     await page.waitForTimeout(1000)
     const finalBox = await node.boundingBox()
     expect(finalBox).toBeTruthy()
     if (initialBox && finalBox) {
-      expect(Math.abs(finalBox.x - initialBox.x)).toBeLessThan(2)
-      expect(Math.abs(finalBox.y - initialBox.y)).toBeLessThan(2)
+      const dx = finalBox.x - initialBox.x
+      const dy = finalBox.y - initialBox.y
+      // Expect the node to have moved approximately by the drag delta (100, 50)
+      // allow a larger tolerance due to grid snapping and UI offsets
+      expect(Math.abs(dx - 100)).toBeLessThan(25)
+      expect(Math.abs(dy - 50)).toBeLessThan(25)
     }
   })
 })

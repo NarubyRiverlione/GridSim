@@ -160,3 +160,21 @@
   text-align: center;
   padding: 4px 8px;
 }
+
+/* Temporary invalid state while dragging */
+.react-flow__node.temp-invalid .custom-node,
+.react-flow__node.temp-invalid .node-icon {
+  outline: 3px solid rgba(239, 68, 68, 0.25);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.15) !important;
+  transform: translateY(-2px);
+}
+
+/* stronger fill for illegal placement to improve visibility */
+.react-flow__node.temp-invalid .custom-node {
+  background: rgba(239, 68, 68, 0.06) !important;
+  border-color: rgba(239, 68, 68, 0.6) !important;
+}
+
+.react-flow__node.temp-invalid .node-icon {
+  background: rgba(239, 68, 68, 0.12) !important;
+}
