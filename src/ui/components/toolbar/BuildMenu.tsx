@@ -4,7 +4,7 @@
 
 import React from 'react'
 import { InteractionMode, PlantType, CitySize, SubstationType } from '@/types'
-import { PlantTypeMenu, CitySizeMenu, SubstationTypeMenu, BufferControl } from './buildMenuComponents'
+import { PlantTypeMenu, CitySizeMenu, SubstationTypeMenu } from './buildMenuComponents'
 import './ToolbarStyles.css'
 
 interface BuildMenuProps {
@@ -15,8 +15,6 @@ interface BuildMenuProps {
   onPlantTypeChange: (type: PlantType) => void
   onCitySizeChange: (size: CitySize) => void
   onSubstationTypeChange: (type: SubstationType) => void
-  placementBuffer: number
-  onPlacementBufferChange: (v: number) => void
 }
 
 export const BuildMenu = ({
@@ -27,8 +25,6 @@ export const BuildMenu = ({
   onPlantTypeChange,
   onCitySizeChange,
   onSubstationTypeChange,
-  placementBuffer,
-  onPlacementBufferChange,
 }: BuildMenuProps): React.ReactElement => {
   let modeSpecificMenu: React.ReactElement | null = null
 
@@ -42,10 +38,5 @@ export const BuildMenu = ({
     )
   }
 
-  return (
-    <div>
-      {modeSpecificMenu}
-      <BufferControl value={placementBuffer} onChange={onPlacementBufferChange} />
-    </div>
-  )
+  return <div>{modeSpecificMenu}</div>
 }

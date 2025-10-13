@@ -180,10 +180,20 @@ export const App = (): React.ReactElement => {
             onPlantTypeChange={placement.setPlantType}
             onCitySizeChange={placement.setCitySize}
             onSubstationTypeChange={placement.setSubstationType}
-            placementBuffer={placementBuffer}
-            onPlacementBufferChange={setPlacementBuffer}
           />
           <ComponentDetailsPanel component={selectedComponent} />
+          <div className="buffer-control-section">
+            <h3>Placement Buffer</h3>
+            <input
+              type="range"
+              id="placement-buffer"
+              min="0"
+              max="50"
+              value={placementBuffer}
+              onChange={e => setPlacementBuffer(Number(e.target.value))}
+            />
+            <div className="buffer-value">Buffer: {placementBuffer}px</div>
+          </div>
         </div>
 
         <div className="canvas-container">
