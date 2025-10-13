@@ -8,13 +8,19 @@ These mechanics govern how components are placed and positioned on the canvas du
 
 **Persistent Node Movement (Drag-and-Drop):**
 
+- ✅ Persistent node movement (drag-and-drop) implemented and persisted to app state. See `src/App.tsx` and `src/ui/components/canvas/GridCanvas.tsx` for drag handlers and persistence logic.
+
 **Collision Detection Improvements (priority):**
 
-- [ ] Harden collision detection so components cannot overlap during placement or after drag
-  - [ ] Enforce bounding-box checks on placement and on drag-stop
-  - [ ] Add optional buffer-zone enforcement (configurable, default 0 or 10px)
-  - [ ] Add visual preview and tooltip when placement is blocked
-  - [ ] Add unit/e2e tests to assert no-overlap behavior during placement/drag
+- Harden collision detection so components cannot overlap during placement or after drag (mostly implemented):
+  - ✅ Enforce bounding-box checks on placement and during drag (implementation in `src/ui/utils/placement.ts` and used by placement hook and canvas)
+  - ✅ Optional buffer-zone enforcement (configurable via Build Menu; default preserved) — `placementBuffer` is persisted in localStorage (`src/App.tsx`) and propagated to the placement logic (`useComponentPlacement`).
+  - ✅ Visual preview with valid/invalid states and blocking behavior: ghost preview shows green/red states and placements blocked with an `ErrorToast` message when overlapping occurs (see `src/ui/components/nodes/GhostNode.tsx`, `NodeStyles.css`, `ErrorToast.tsx`).
+  - ⚠️ Unit/e2e tests updated to reflect new behavior; placement e2e specs have been hardened to count node types (see `e2e/placement.spec.ts`) and are passing locally. Additional targeted edge-case tests are recommended.
+  - ⚠️ Unit/e2e tests updated to reflect new behavior; placement e2e specs have been hardened to count node types (see `e2e/placement.spec.ts`) and are passing locally. Additional targeted edge-case tests are recommended.
+  - Recent fixes: placement ghost preview no longer persists after successful placement (ghost cleared and real component added). See `src/ui/hooks/useComponentPlacement.ts` and `src/ui/components/canvas/GridCanvas.tsx` for the placement flow.
+
+Notes: While collision plumbing, buffer support, preview styling and blocking are implemented, some rare overlap flows and additional test coverage remain as follow-ups (see 'Remaining work' below).
 
 ---
 
@@ -181,11 +187,23 @@ Invalid placement (collision detected):
 **Implemented (Phase 0):**
 
 - ✅ Snap-to-grid for all component placements
-- ⚠️ Node collision detection — partial (overlap can still occur in some flows)
-- ✅ Visual feedback (green/red outlines) in many flows
-- ✅ Drag-and-drop with collision checking and persistent positions (drag persistence implemented)
+- ✅ Bounding-box based collision detection on placement and during drag (buffered overlap checks implemented)
+- ✅ Visual feedback (ghost preview shows valid/invalid states; stronger invalid styling added)
+- ✅ Visual feedback (ghost preview shows valid/invalid states; stronger invalid styling added)
+- ✅ Placement ghost cleared on successful placement (previously some tests observed the ghost remaining after a confirmed placement)
+- ✅ Drag-and-drop with collision checking and persistent positions (drag persistence implemented in `App.tsx`)
 - ✅ Component size bounding boxes
 - ✅ Canvas boundary constraints
+
+**Test and E2E updates:**
+
+- ✅ Playwright e2e tests updated to be robust to ghost previews and placement buffer (see `e2e/placement.spec.ts` and `e2e/collision.spec.ts`). Many placement tests are passing locally after hardening.
+- ✅ Playwright e2e tests updated to be robust to ghost previews and placement buffer (see `e2e/placement.spec.ts` and `e2e/collision.spec.ts`). The placement spec was recently fixed to reliably place components even if the test clicks without hovering first; full placement suite passes locally.
+- ✅ Performance fixes: RAF-batched mouse-move updates and shallow-equality guards prevent no-op node/edge updates and significantly reduce edge re-renders during mouse move. See `src/ui/components/canvas/GridCanvas.tsx` for batching and guard logic.
+- ✅ UX fixes: transmission-line label elements use `pointer-events: none` to avoid pointer interception and hover flicker. Labels are shown on hover/select by default; code supports an 'always show' flag for future toggle.
+- ✅ Playwright placement e2e tests passing locally after fixes. Additional e2e additions planned:
+  - add a console-capture e2e test that collects and summarizes console logs during a mouse-move sweep (tooling exists in `e2e/edge-render-debug.spec.ts` but it may be toggled off in CI to avoid noisy logs).
+  - add tests for optional 'always show' label toggle when implemented.
 
 **Visual Hints Only (Phase 0):**
 

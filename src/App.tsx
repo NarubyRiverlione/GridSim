@@ -77,6 +77,7 @@ export const App = (): React.ReactElement => {
 
   // Handler for adding new components
   const handleComponentAdd = (component: Component): void => {
+    // console.log('App.handleComponentAdd:', component)
     if ('type' in component && 'capacity' in component && 'currentOutput' in component) {
       setPowerPlants([...powerPlants, component])
     } else if ('name' in component && 'size' in component) {

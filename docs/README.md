@@ -150,3 +150,12 @@ All documents reference each other where relevant:
   - Split monolithic DesignDoc.md (865 lines) into 6 focused documents
   - Motivation: Improve AI context efficiency and human readability
   - Result: Better separation of concerns, easier maintenance
+
+- **2025-10-13**: Phase 0 implementation progress
+  - Implemented snap-to-grid, bounding-box collision checks (with optional buffer), ghost preview visual states, and persistent drag-and-drop positions.
+  - Playwright e2e tests updated to reflect placement-buffer behavior and ghost previews; many placement tests now pass locally.
+
+- **2025-10-13 (update)**: Additional Phase 0 fixes and hardening
+  - Placement ghost preview no longer persists after a confirmed placement; placement flow hardened so clicks without prior hover succeed in tests.
+  - RAF-batched mouse-move updates and shallow-equality guards added to reduce unnecessary node/edge re-renders.
+  - Edge label pointer-event fixes to avoid hover flicker. Placement e2e specs pass locally after these fixes.

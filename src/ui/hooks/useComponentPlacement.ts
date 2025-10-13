@@ -100,6 +100,17 @@ export const useComponentPlacement = ({
       const buffer = placementBuffer
       const isValid = isValidPlacement(snappedPos.x, snappedPos.y, componentSize, existingComponents, buffer)
 
+      console.debug(
+        'useComponentPlacement.handleMouseMove: snappedPos=',
+        snappedPos,
+        'size=',
+        componentSize,
+        'buffer=',
+        buffer,
+        'isValid=',
+        isValid
+      )
+
       setPlacementState({
         isPlacing: true,
         ghostPosition: snappedPos,
@@ -115,6 +126,16 @@ export const useComponentPlacement = ({
       const componentSize = getComponentSizeForMode(mode, placementConfig)
       const buffer = placementBuffer
       const isValid = isValidPlacement(snappedPos.x, snappedPos.y, componentSize, existingComponents, buffer)
+      console.debug(
+        'useComponentPlacement.handleClick: snappedPos=',
+        snappedPos,
+        'size=',
+        componentSize,
+        'buffer=',
+        buffer,
+        'isValid=',
+        isValid
+      )
 
       if (!isValid) {
         return null
@@ -122,6 +143,14 @@ export const useComponentPlacement = ({
 
       // Create the appropriate component based on mode
       const newComponent = createComponentForMode(mode, snappedPos, placementConfig)
+      // Clear placement ghost/preview now that placement was confirmed
+      setPlacementState({
+        isPlacing: false,
+        ghostPosition: null,
+        isValidPosition: false,
+      })
+      // Emit an explicit console log so e2e runner will capture placement success
+      // console.log('useComponentPlacement.handleClick: placed component', newComponent)
       return newComponent
     },
     [mode, placementConfig, existingComponents, placementBuffer]

@@ -238,6 +238,13 @@ Comprehensive end-to-end tests covering:
 **Test Categories:**
 
 - `e2e/app.spec.ts` - Core application functionality
+
+## Recent progress (Phase 0)
+
+- Placement fixes: the ghost preview is now cleared after a confirmed placement and the placement flow was hardened so tests that click without prior hover still succeed. See `src/ui/hooks/useComponentPlacement.ts` and `src/ui/components/canvas/GridCanvas.tsx`.
+- Performance: mouse-move updates are batched via requestAnimationFrame and there are shallow-equality guards to avoid no-op setNodes/setEdges updates. This significantly reduces edge re-renders during pointer movement.
+- UX: edge label elements no longer intercept pointer events (use `pointer-events: none`) to prevent hover flicker; labels are shown on hover/select by default.
+- E2E: placement-related Playwright specs pass locally after the fixes. Additional e2e tests (console-capture, label-visibility toggle) remain planned.
 - `e2e/interactions.spec.ts` - User interactions and component selection
 - `e2e/visual.spec.ts` - Visual regression tests
 

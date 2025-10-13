@@ -67,6 +67,20 @@ export const GridCanvas = ({
 }: GridCanvasProps): React.ReactElement => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null)
   const { screenToFlowPosition } = useReactFlow()
+  const lastMouseLog = useRef<number>(0)
+  const renderCount = useRef(0)
+  renderCount.current += 1
+  // Debug: log GridCanvas render count
+  console.debug(`GridCanvas render count=${renderCount.current}`)
+  // RAF batching refs for mouse move
+  const rafId = useRef<number | null>(null)
+  const pendingPos = useRef<{ x: number; y: number } | null>(null)
+  const placementBufferRef = useRef<number>(typeof placementBuffer === 'number' ? placementBuffer : 10)
+
+  // keep placementBufferRef in sync
+  useEffect(() => {
+    placementBufferRef.current = typeof placementBuffer === 'number' ? placementBuffer : 10
+  }, [placementBuffer])
 
   // Convert components to React Flow nodes
   const componentNodes: Node[] = useMemo(
@@ -82,11 +96,13 @@ export const GridCanvas = ({
 
   // Add ghost node if placing
   const allNodes = useMemo(() => {
+    // Only render the ghost preview when placementState has an explicit ghostPosition
     if (placementState.isPlacing && placementState.ghostPosition !== null) {
+      const ghostPos = placementState.ghostPosition
       const ghostNode: Node = {
         id: GHOST_NODE_ID,
         type: 'ghost',
-        position: placementState.ghostPosition,
+        position: ghostPos,
         data: {
           isValid: placementState.isValidPosition,
           size: getComponentSize({ type: mode, ...placementConfig }),
@@ -115,16 +131,72 @@ export const GridCanvas = ({
 
   const [nodes, setNodes, onNodesChange] = useNodesState(allNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState(edgesData)
+  // Keep previous values to avoid calling setNodes when nothing changed
+  const prevAllNodesRef = useRef<Node[] | null>(null)
 
-  // Update nodes when components or placement state changes
+  const shallowNodesEqual = useCallback((a: Node[], b: Node[] | null): boolean => {
+    if (b === null) return false
+    if (a.length !== b.length) return false
+    for (let i = 0; i < a.length; i++) {
+      const na = a[i]
+      const nb = b[i]
+      if (!na || !nb) return false
+      if (na.id !== nb.id) return false
+      const pa = na.position as { x?: number; y?: number } | undefined
+      const pb = nb.position as { x?: number; y?: number } | undefined
+      if ((pa?.x ?? 0) !== (pb?.x ?? 0) || (pa?.y ?? 0) !== (pb?.y ?? 0)) return false
+      if ((na.className ?? '') !== (nb.className ?? '')) return false
+      const da = na.data as { id?: string } | undefined
+      const db = nb.data as { id?: string } | undefined
+      if ((da?.id ?? '') !== (db?.id ?? '')) return false
+    }
+    return true
+  }, [])
+
+  // Update nodes when components or placement state changes, but avoid no-op updates
   useEffect(() => {
+    try {
+      if (prevAllNodesRef.current && shallowNodesEqual(allNodes, prevAllNodesRef.current)) {
+        return
+      }
+    } catch {
+      // fallthrough
+    }
+    console.debug('GridCanvas effect: setNodes called, allNodes length=', allNodes.length)
     setNodes(allNodes)
-  }, [allNodes, setNodes])
+    prevAllNodesRef.current = allNodes
+  }, [allNodes, setNodes, shallowNodesEqual])
 
-  // Update edges when transmission lines change
+  // Keep previous edges to avoid calling setEdges when nothing changed
+  const prevEdgesRef = useRef<Edge[] | null>(null)
+  const shallowEdgesEqual = useCallback((a: Edge[], b: Edge[] | null): boolean => {
+    if (b === null) return false
+    if (a.length !== b.length) return false
+    for (let i = 0; i < a.length; i++) {
+      const ea = a[i]
+      const eb = b[i]
+      if (!ea || !eb) return false
+      if (ea.id !== eb.id) return false
+      if (ea.source !== eb.source || ea.target !== eb.target) return false
+      // assume data content identity matters; if it's the same reference it's fine
+      if (ea.data !== eb.data) return false
+    }
+    return true
+  }, [])
+
+  // Update edges when transmission lines change, avoid no-op updates
   useEffect(() => {
+    try {
+      if (prevEdgesRef.current && shallowEdgesEqual(edgesData, prevEdgesRef.current)) {
+        return
+      }
+    } catch {
+      // fallthrough
+    }
+    console.debug('GridCanvas effect: setEdges called, edgesData length=', edgesData.length)
     setEdges(edgesData)
-  }, [edgesData, setEdges])
+    prevEdgesRef.current = edgesData
+  }, [edgesData, setEdges, shallowEdgesEqual])
 
   // Handle node selection or line drawing
   const handleNodeClick = useCallback(
@@ -198,13 +270,20 @@ export const GridCanvas = ({
   // Handle pane click (deselect or place component)
   const handlePaneClick = useCallback(
     (event?: React.MouseEvent): void => {
-      if (placementState.isPlacing && placementState.ghostPosition !== null) {
-        // Compute the flow coordinates from the actual click event when available
+      const isPlacementMode =
+        mode === InteractionMode.AddPowerPlant ||
+        mode === InteractionMode.AddCity ||
+        mode === InteractionMode.AddSubstation ||
+        mode === InteractionMode.AddSwitchingStation ||
+        mode === InteractionMode.AddPylon
+
+      if (isPlacementMode) {
+        // Prefer using the actual click event coordinates when available (tests click directly).
         const clickPos = event
           ? screenToFlowPosition({ x: event.clientX, y: event.clientY })
           : placementState.ghostPosition
+        if (!clickPos) return
 
-        // determine component size based on placement mode and config
         const getSizeForMode = (m: InteractionMode, cfg: PlacementConfig): number => {
           switch (m) {
             case InteractionMode.AddPowerPlant:
@@ -226,27 +305,21 @@ export const GridCanvas = ({
         }
 
         const size = getSizeForMode(mode, placementConfig)
-        const collides = checkCollision(clickPos.x, clickPos.y, size, components, undefined, 10)
+        const collides = checkCollision(clickPos.x, clickPos.y, size, components, undefined, placementBuffer)
+        console.debug('GridCanvas.handlePaneClick: clickPos=', clickPos, 'size=', size, 'collides=', collides)
         if (collides) {
-          if (typeof onPlacementBlocked === 'function') {
-            onPlacementBlocked('Placement blocked: space occupied')
-          }
+          if (typeof onPlacementBlocked === 'function') onPlacementBlocked('Placement blocked: space occupied')
           return
         }
 
-        if (placementState.isValidPosition) {
-          // Place the component using the flow coordinates
-          const newComponent = onPlacementClick(clickPos.x, clickPos.y)
-          if (newComponent !== null) {
-            onComponentAdd(newComponent)
-          }
-        }
-      } else {
-        // Deselect
-        onComponentSelect(null)
+        const newComponent = onPlacementClick(clickPos.x, clickPos.y)
+        // console.log('GridCanvas.handlePaneClick: onPlacementClick returned', newComponent)
+        if (newComponent !== null) onComponentAdd(newComponent)
+        return
       }
-      // placementBuffer intentionally included in deps to ensure validation uses latest value
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+
+      // Not in placement mode — deselect
+      onComponentSelect(null)
     },
     [
       placementState,
@@ -267,16 +340,25 @@ export const GridCanvas = ({
     (event: React.MouseEvent): void => {
       if (reactFlowWrapper.current === null) return
 
-      const position = screenToFlowPosition({
-        x: event.clientX,
-        y: event.clientY,
+      const position = screenToFlowPosition({ x: event.clientX, y: event.clientY })
+
+      // Throttled debug logging to observe mouse move frequency without flooding console
+      const now = Date.now()
+      if (now - lastMouseLog.current > 200) {
+        console.debug(`GridCanvas mouseMove flowPos=${position.x},${position.y}`)
+        lastMouseLog.current = now
+      }
+
+      // Batch placement and line-preview updates via requestAnimationFrame to avoid high-frequency state updates
+      pendingPos.current = position
+      rafId.current ??= window.requestAnimationFrame(() => {
+        rafId.current = null
+        const pos = pendingPos.current
+        pendingPos.current = null
+        if (!pos) return
+        onMouseMove(pos.x, pos.y)
+        onMouseMoveForLine(pos.x, pos.y)
       })
-
-      // Update placement preview
-      onMouseMove(position.x, position.y)
-
-      // Update line drawing preview
-      onMouseMoveForLine(position.x, position.y)
     },
     [onMouseMove, onMouseMoveForLine, screenToFlowPosition]
   )
