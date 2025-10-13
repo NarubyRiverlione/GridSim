@@ -4,6 +4,18 @@ These mechanics govern how components are placed and positioned on the canvas du
 
 ---
 
+## Critical TODOs for Phase 0
+
+**Persistent Node Movement (Drag-and-Drop):**
+
+- [ ] Implement `onNodeDragStop` handler in `GridCanvas` to update node position in app state
+- [ ] Pass `onNodeDragStop` to React Flow
+- [ ] Update the corresponding component's `location` in state arrays (`powerPlants`, `cities`, etc.) in `App.tsx` when a node is moved
+- [ ] Ensure node position persists after drag and does not snap back
+- [ ] Maintain snap-to-grid and collision detection during movement
+
+---
+
 ## Snap-to-Grid
 
 **Purpose**: Provide clean, aligned component placement and prevent free-form positioning chaos.
