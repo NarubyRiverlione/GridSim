@@ -11,6 +11,8 @@
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   min-width: auto;
+  width: 56px;
+  height: 56px;
   transition: all 0.3s ease;
 }
 
@@ -20,6 +22,8 @@
   padding: 8px 12px;
   gap: 8px;
   justify-content: flex-start;
+  width: auto;
+  height: auto;
 }
 
 .custom-node.selected {
@@ -100,9 +104,9 @@
 
 /* Pylon-specific styles */
 .pylon-node .node-icon {
-  width: 30px;
-  height: 30px;
-  font-size: 16px;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
 }
 
 /* React Flow handle customization */
