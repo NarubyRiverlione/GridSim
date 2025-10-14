@@ -3,19 +3,23 @@
 .custom-node {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
+  justify-content: center;
+  gap: 0;
+  padding: 8px;
   background: white;
   border: 2px solid;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  min-width: 180px;
-  transition: all 0.2s ease;
+  min-width: auto;
+  transition: all 0.3s ease;
 }
 
 .custom-node:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transform: translateY(-1px);
+  padding: 8px 12px;
+  gap: 8px;
+  justify-content: flex-start;
 }
 
 .custom-node.selected {
@@ -60,6 +64,16 @@
   gap: 2px;
   flex: 1;
   min-width: 0;
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.custom-node:hover .node-content {
+  max-width: 200px;
+  opacity: 1;
+  margin-left: 4px;
 }
 
 .node-title {
@@ -85,10 +99,6 @@
 }
 
 /* Pylon-specific styles */
-.pylon-node {
-  min-width: 120px;
-}
-
 .pylon-node .node-icon {
   width: 30px;
   height: 30px;
