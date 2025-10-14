@@ -34,8 +34,9 @@ export interface CitySpec {
 export const CITY_SPECS: Record<CitySize, CitySpec> = {
   [CitySize.SmallTown]: { baseDemand: 35, displaySize: 'Small Town' },
   [CitySize.MediumCity]: { baseDemand: 150, displaySize: 'Medium City' },
-  [CitySize.LargeCity]: { baseDemand: 650, displaySize: 'Large City' },
-  [CitySize.MajorMetro]: { baseDemand: 3000, displaySize: 'Major Metro' },
+  [CitySize.LargeCity]: { baseDemand: 600, displaySize: 'Large City' },
+  // major metro is possible to big demand to have a clean UX : 1MW * 2 seasons = 7x 110kv lines
+  [CitySize.MajorMetro]: { baseDemand: 1000, displaySize: 'Major Metro' },
 }
 
 /**
