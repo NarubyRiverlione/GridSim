@@ -26,6 +26,28 @@
   height: auto !important;
 }
 
+/* Disable node expansion when in line drawing mode */
+[data-mode="AddTransmissionLine"] .custom-node:hover {
+  padding: 8px;
+  gap: 0;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+}
+
+/* City nodes have dynamic size, preserve it in line drawing mode */
+[data-mode="AddTransmissionLine"] .city-node:hover {
+  width: var(--city-size) !important;
+  height: var(--city-size) !important;
+}
+
+/* Hide node content on hover when in line drawing mode */
+[data-mode="AddTransmissionLine"] .custom-node:hover .node-content {
+  max-width: 0;
+  opacity: 0;
+  margin-left: 0;
+}
+
 .custom-node.selected {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
   animation: pulse-selection 2s ease-in-out infinite;

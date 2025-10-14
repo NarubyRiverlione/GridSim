@@ -294,7 +294,12 @@ export const GridCanvas = ({
   )
 
   return (
-    <div className="grid-canvas" ref={reactFlowWrapper} onMouseMove={handleMouseMove}>
+    <div
+      className="grid-canvas"
+      data-mode={mode}
+      ref={reactFlowWrapper}
+      onMouseMove={handleMouseMove}
+    >
       <ReactFlow
         nodes={nodes}
         edges={edges}
