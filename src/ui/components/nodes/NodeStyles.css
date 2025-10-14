@@ -27,25 +27,31 @@
 }
 
 /* Disable node expansion when in line drawing mode */
-[data-mode="AddTransmissionLine"] .custom-node:hover {
-  padding: 8px;
-  gap: 0;
-  justify-content: center;
-  width: 56px;
-  height: 56px;
+[data-mode="add-transmission-line"] .custom-node:hover {
+  padding: 8px !important;
+  gap: 0 !important;
+  justify-content: center !important;
+  width: 56px !important;
+  height: 56px !important;
+  transform: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
 }
 
 /* City nodes have dynamic size, preserve it in line drawing mode */
-[data-mode="AddTransmissionLine"] .city-node:hover {
-  width: var(--city-size) !important;
-  height: var(--city-size) !important;
+[data-mode="add-transmission-line"] .city-node:hover {
+  /* City nodes need to preserve their dynamic inline style width/height */
+  padding: 8px !important;
+  gap: 0 !important;
+  justify-content: center !important;
+  transform: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
 }
 
 /* Hide node content on hover when in line drawing mode */
-[data-mode="AddTransmissionLine"] .custom-node:hover .node-content {
-  max-width: 0;
-  opacity: 0;
-  margin-left: 0;
+[data-mode="add-transmission-line"] .custom-node:hover .node-content {
+  max-width: 0 !important;
+  opacity: 0 !important;
+  margin-left: 0 !important;
 }
 
 .custom-node.selected {
