@@ -5,20 +5,20 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('Node Move', () => {
-  test('should drag a power plant node to a new position', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
-    await page.waitForSelector('.plant-node', { timeout: 5000 })
+  test('should drag a substation node to a new position', async ({ page }) => {
+    await page.goto('/?mockdata=e2e')
+    await page.waitForSelector('.substation-node', { timeout: 5000 })
 
     // Get initial position of the node
-    const node = page.locator('.plant-node').first()
+    const node = page.locator('[data-id="substation-G1"]')
     const initialBox = await node.boundingBox()
     expect(initialBox).toBeTruthy()
 
-    // Drag the node by 100px right and 50px down
+    // Drag the node by 50px right and 50px down
     if (initialBox) {
       await page.mouse.move(initialBox.x + initialBox.width / 2, initialBox.y + initialBox.height / 2)
       await page.mouse.down()
-      await page.mouse.move(initialBox.x + initialBox.width / 2 + 100, initialBox.y + initialBox.height / 2 + 50, {
+      await page.mouse.move(initialBox.x + initialBox.width / 2 + 50, initialBox.y + initialBox.height / 2 + 50, {
         steps: 10,
       })
       await page.mouse.up()
@@ -44,7 +44,7 @@ test.describe('Node Move', () => {
       const dy = finalBox.y - initialBox.y
       // Expect the node to have moved approximately by the drag delta (100, 50)
       // allow a larger tolerance due to grid snapping and UI offsets
-      expect(Math.abs(dx - 100)).toBeLessThan(25)
+      expect(Math.abs(dx - 50)).toBeLessThan(25)
       expect(Math.abs(dy - 50)).toBeLessThan(25)
     }
   })

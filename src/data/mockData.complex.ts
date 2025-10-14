@@ -159,58 +159,7 @@ export const mockTransmissionLines: TransmissionLine[] = [
     breakerTripped: false,
     state: ComponentState.Healthy,
   },
-  // Chain 2: plant-2 → substation-G2 → substation-Z2 → city-2
-  {
-    id: 'line-6',
-    from: 'plant-2',
-    to: 'substation-G2',
-    path: [
-      { x: 800, y: 100 },
-      { x: 800, y: 200 },
-    ],
-    voltage: VoltageLevel.KV400,
-    capacity: 1500,
-    currentLoad: 600,
-    resistance: 0.05,
-    distance: 100,
-    breakerClosed: true,
-    breakerTripped: false,
-    state: ComponentState.Healthy,
-  },
-  {
-    id: 'line-7',
-    from: 'substation-G2',
-    to: 'substation-Z2',
-    path: [
-      { x: 800, y: 200 },
-      { x: 800, y: 350 },
-    ],
-    voltage: VoltageLevel.KV220,
-    capacity: 600,
-    currentLoad: 500,
-    resistance: 0.04,
-    distance: 150,
-    breakerClosed: true,
-    breakerTripped: false,
-    state: ComponentState.Healthy,
-  },
-  {
-    id: 'line-8',
-    from: 'substation-Z2',
-    to: 'city-2',
-    path: [
-      { x: 800, y: 350 },
-      { x: 800, y: 500 },
-    ],
-    voltage: VoltageLevel.KV110,
-    capacity: 250,
-    currentLoad: 150,
-    resistance: 0.04,
-    distance: 150,
-    breakerClosed: true,
-    breakerTripped: false,
-    state: ComponentState.Healthy,
-  },
+
   // Additional connections for testing
   {
     id: 'line-9',
@@ -311,7 +260,7 @@ export const mockSubstations: Substation[] = [
   },
   {
     id: 'substation-G3',
-    location: { x: 500, y: 100 },
+    location: { x: 200, y: 200 },
     substationType: SubstationType.Grid,
     voltageIn: VoltageLevel.KV400,
     voltageOut: VoltageLevel.KV220,

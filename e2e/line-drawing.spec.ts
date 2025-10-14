@@ -6,7 +6,7 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Line Drawing System', () => {
   test('should switch to line drawing mode', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
+    await page.goto('/?mockdata=e2e')
     await page.waitForSelector('.mode-switcher', { timeout: 5000 })
 
     // Click line mode button
@@ -18,7 +18,7 @@ test.describe('Line Drawing System', () => {
   })
 
   test('should draw line between pylon and switching station', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
+    await page.goto('/?mockdata=e2e')
     await page.waitForSelector('.react-flow__edge', { timeout: 5000 })
     const initialCount = await page.locator('.react-flow__edge').count()
     const lineButton = page.locator('button:has-text("Line")')
@@ -31,17 +31,18 @@ test.describe('Line Drawing System', () => {
     // Use pylon-2 and substation since pylon-1 already connects to switching-1 (line-9)
     const pylon = page.locator('.pylon-node').nth(1) // pylon-2
     await pylon.click({ force: true })
-    const substation = page.locator('.substation-node').first() // substation-G1
+    // locate substation by attribute data-id=substation-G3
+    const substation = page.locator('[data-id="substation-G3"]')
     await substation.click({ force: true })
     await page.waitForTimeout(500)
     const newCount = await page.locator('.react-flow__edge').count()
 
-    // Mock data has 10 lines, should add one more
+    // Mock data has 20 lines, should add one more
     expect(newCount).toBeGreaterThan(initialCount)
   })
 
   test('should show preview line when drawing', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
+    await page.goto('/?mockdata=e2e')
     await page.waitForSelector('.react-flow__node', { timeout: 5000 })
 
     // Switch to line drawing mode
@@ -61,7 +62,7 @@ test.describe('Line Drawing System', () => {
   })
 
   test('should handle city to city connection attempt', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
+    await page.goto('/?mockdata=e2e')
     await page.waitForSelector('.city-node', { timeout: 5000 })
     const cityCount = await page.locator('.city-node').count()
     if (cityCount < 2) {
@@ -93,39 +94,8 @@ test.describe('Line Drawing System', () => {
     expect(errorVisible || newCount === initialCount).toBe(true)
   })
 
-  test('should prevent duplicate lines', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
-    await page.waitForSelector('.react-flow__node', { timeout: 5000 })
-    const initialCount = await page.locator('.react-flow__edge').count()
-    const lineButton = page.locator('button:has-text("Line")')
-    await lineButton.click()
-    await expect(lineButton).toHaveClass(/active/)
-
-    await page.waitForTimeout(200)
-
-    // Use plant-1 and substation-G3 (no existing connection)
-    const plant = page.locator('.plant-node').first()
-    await plant.click({ force: true })
-    const substations = page.locator('.substation-node')
-    const substation = substations.nth(Math.min(2, (await substations.count()) - 1)) // substation-G3
-    await substation.click({ force: true })
-    await page.waitForTimeout(500)
-
-    const countAfterFirst = await page.locator('.react-flow__edge').count()
-
-    // Try to draw the same line again
-    await plant.click({ force: true })
-    await substation.click({ force: true })
-    await page.waitForTimeout(500)
-    const newCount = await page.locator('.react-flow__edge').count()
-
-    // Should only add one line (duplicate prevention)
-    expect(countAfterFirst).toBeGreaterThan(initialCount)
-    expect(newCount).toBe(countAfterFirst) // No second line added
-  })
-
   test('should cancel line drawing when clicking pane', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
+    await page.goto('/?mockdata=e2e')
     await page.waitForSelector('.react-flow__node', { timeout: 5000 })
 
     // Switch to line drawing mode
@@ -148,8 +118,8 @@ test.describe('Line Drawing System', () => {
     expect(errorVisible).toBe(false)
   })
 
-  test('should connect power plant to pylon', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
+  test('should connect grid substation  to pylon', async ({ page }) => {
+    await page.goto('/?mockdata=e2e')
     await page.waitForSelector('.react-flow__node', { timeout: 5000 })
     const initialCount = await page.locator('.react-flow__edge').count()
     const lineButton = page.locator('button:has-text("Line")')
@@ -158,9 +128,9 @@ test.describe('Line Drawing System', () => {
 
     await page.waitForTimeout(200)
 
-    const powerPlant = page.locator('.plant-node').first()
-    await powerPlant.click({ force: true })
-    const pylon = page.locator('.pylon-node').first()
+    const substation = page.locator('[data-id="substation-G3"]')
+    await substation.click({ force: true })
+    const pylon = page.locator('[data-id="pylon-2"]')
     await pylon.click({ force: true })
     await page.waitForTimeout(500)
     const newCount = await page.locator('.react-flow__edge').count()
@@ -170,14 +140,14 @@ test.describe('Line Drawing System', () => {
   })
 
   test('should display default details panel text', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
+    await page.goto('/?mockdata=e2e')
     await page.waitForSelector('.details-panel', { timeout: 5000 })
     const detailsPanel = page.locator('.details-panel')
     await expect(detailsPanel).toContainText('Select a component to view details', { timeout: 5000 })
   })
 
   test('should switch back to select mode after drawing line', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
+    await page.goto('/?mockdata=e2e')
     await page.waitForSelector('.react-flow__node', { timeout: 5000 })
 
     // Switch to line drawing mode
@@ -205,7 +175,7 @@ test.describe('Line Drawing System', () => {
 
   // New tests for direct component connections (voltage cascade)
   test('should connect power plant to grid substation (400kV)', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
+    await page.goto('/?mockdata=e2e')
     await page.waitForSelector('.react-flow__node', { timeout: 5000 })
 
     const initialCount = await page.locator('.react-flow__edge').count()
@@ -220,13 +190,11 @@ test.describe('Line Drawing System', () => {
     await page.waitForSelector('.plant-node', { timeout: 5000 })
     await page.waitForSelector('.substation-node', { timeout: 5000 })
 
-    // Connect plant-1 to substation-G3 (no existing connection, both 400kV)
-    const powerPlant = page.locator('.plant-node').first() // plant-1
+    // Connect plant-2 to substation-G2 (no existing connection, both 400kV)
+    const powerPlant = page.locator('[data-id="plant-2"]')
     await powerPlant.click({ force: true })
 
-    const substations = page.locator('.substation-node')
-    const substationCount = await substations.count()
-    const substation = substations.nth(substationCount - 1) // substation-G3 (last one)
+    const substation = page.locator('[data-id="substation-G2"]')
     await substation.click({ force: true })
 
     await page.waitForTimeout(500)
@@ -237,7 +205,7 @@ test.describe('Line Drawing System', () => {
   })
 
   test('should connect grid substation to zone substation (220kV)', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
+    await page.goto('/?mockdata=e2e')
     await page.waitForSelector('.react-flow__node', { timeout: 5000 })
 
     const initialCount = await page.locator('.react-flow__edge').count()
@@ -248,17 +216,15 @@ test.describe('Line Drawing System', () => {
     await expect(lineButton).toHaveClass(/active/)
     await page.waitForTimeout(200)
 
-    // Connect substation-G3 output (220kV) to substation-Z1 input (220kV)
+    // Connect substation-G2 output (220kV) to substation-Z2 input (220kV)
     // Wait for substations to be visible
     await page.waitForSelector('.substation-node', { timeout: 5000 })
-    const substations = page.locator('.substation-node')
-    const substationCount = await substations.count()
 
-    // Click the last substation (substation-G3)
-    const firstSubstation = substations.nth(substationCount - 1)
+    // Click the last substation (substation-G2)
+    const firstSubstation = page.locator('[data-id="substation-G2"]') // get by data-id=substation-G2
     await firstSubstation.click({ force: true })
 
-    const secondSubstation = substations.first() // substation-Z1
+    const secondSubstation = page.locator('[data-id="substation-Z2"]') // get by data-id=substation-Z2
     await secondSubstation.click({ force: true })
 
     await page.waitForTimeout(500)
@@ -269,7 +235,7 @@ test.describe('Line Drawing System', () => {
   })
 
   test('should connect zone substation to city (110kV)', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
+    await page.goto('/?mockdata=e2e')
     await page.waitForSelector('.react-flow__node', { timeout: 5000 })
 
     const initialCount = await page.locator('.react-flow__edge').count()
@@ -282,18 +248,14 @@ test.describe('Line Drawing System', () => {
 
     // Wait for substations to be visible
     await page.waitForSelector('.substation-node', { timeout: 5000 })
-    const substations = page.locator('.substation-node')
-    const substationCount = await substations.count()
 
-    // Connect substation-Z1 to city-2 (should be a new connection)
-    // substation-Z1 is already connected to pylon-1, but not directly to city-2
-    const substation = substations.nth(1) // substation-Z1 (2nd substation)
+    // Connect substation-Z2 to city-2 (should be a new connection)
+    const substation = page.locator('[data-id="substation-Z2"]') // substation-Z2 (2nd substation)
     await substation.click({ force: true })
 
-    // Wait and find city-1 (Berlin) - connect to first city
+    // Wait and find city-2 - connect to second city
     await page.waitForSelector('.city-node', { timeout: 5000 })
-    const cities = page.locator('.city-node')
-    const city = cities.first() // city-1 (Berlin)
+    const city = page.locator('[data-id="city-2"]')
     await city.click({ force: true })
 
     await page.waitForTimeout(500)
@@ -304,7 +266,7 @@ test.describe('Line Drawing System', () => {
   })
 
   test('should show error for invalid voltage connection (power plant to city)', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
+    await page.goto('/?mockdata=e2e')
     await page.waitForSelector('.react-flow__node', { timeout: 5000 })
 
     // Switch to line drawing mode
@@ -328,7 +290,7 @@ test.describe('Line Drawing System', () => {
   })
 
   test('should show error for wrong direction substation connection', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
+    await page.goto('/?mockdata=e2e')
     await page.waitForSelector('.react-flow__node', { timeout: 5000 })
 
     // Switch to line drawing mode

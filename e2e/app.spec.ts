@@ -7,7 +7,7 @@ import { test, expect } from '@playwright/test'
 
 test.describe('GridSim Application', () => {
   test('should load the application and display the header', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
+    await page.goto('/?mockdata=e2e')
 
     // Check that the app loads
     await expect(page).toHaveTitle(/GridSim/)
@@ -19,7 +19,7 @@ test.describe('GridSim Application', () => {
   })
 
   test('should display the grid canvas', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
+    await page.goto('/?mockdata=e2e')
 
     // Check that React Flow canvas is rendered
     await expect(page.locator('.react-flow')).toBeVisible()
@@ -32,7 +32,7 @@ test.describe('GridSim Application', () => {
   })
 
   test('should display mode switcher with all modes', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
+    await page.goto('/?mockdata=e2e')
 
     // Check mode switcher is visible
     await expect(page.locator('.mode-switcher')).toBeVisible()
@@ -52,7 +52,7 @@ test.describe('GridSim Application', () => {
   })
 
   test('should switch between interaction modes', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
+    await page.goto('/?mockdata=e2e')
 
     // Select mode should be active by default
     const selectButton = page.locator('.mode-button').nth(0)
@@ -72,7 +72,7 @@ test.describe('GridSim Application', () => {
   })
 
   test('should display grid status panel with metrics', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
+    await page.goto('/?mockdata=e2e')
 
     // Check grid status panel is visible
     const statusPanel = page.locator('.grid-status-panel')
@@ -89,7 +89,7 @@ test.describe('GridSim Application', () => {
   })
 
   test('should display time control panel', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
+    await page.goto('/?mockdata=e2e')
 
     // Check time control panel is visible
     const timePanel = page.locator('.time-control-panel')
@@ -106,7 +106,7 @@ test.describe('GridSim Application', () => {
   })
 
   test('should display component details panel with empty state', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
+    await page.goto('/?mockdata=e2e')
 
     // Check details panel is visible
     const detailsPanel = page.locator('.details-panel')
@@ -118,7 +118,7 @@ test.describe('GridSim Application', () => {
   })
 
   test('should display grid components (nodes) on canvas', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
+    await page.goto('/?mockdata=e2e')
 
     // Wait for React Flow to render
     await page.waitForSelector('.react-flow__node', { timeout: 5000 })
@@ -126,7 +126,7 @@ test.describe('GridSim Application', () => {
     // Check that nodes are present
     const nodes = page.locator('.react-flow__node')
     const nodeCount = await nodes.count()
-    expect(nodeCount).toBe(7) //  plants +  cities +  2 substations +  switching +  pylons + wire
+    expect(nodeCount).toBe(12) // 2 plants + 2 cities +  5 substations + 1 switching + 2 pylons = 12
 
     // Check for different node types
     await expect(page.locator('.plant-node').first()).toBeVisible()
@@ -134,7 +134,7 @@ test.describe('GridSim Application', () => {
   })
 
   test('should display transmission lines (edges) on canvas', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
+    await page.goto('/?mockdata=e2e')
 
     // Wait for React Flow to render
     await page.waitForSelector('.react-flow__edge', { timeout: 5000 })
@@ -142,7 +142,7 @@ test.describe('GridSim Application', () => {
     // Check that edges are present
     const edges = page.locator('.react-flow__edge')
     const edgeCount = await edges.count()
-    expect(edgeCount).toBe(12)
+    expect(edgeCount).toBe(14)  
 
     // Check for edge labels (hidden by default, visible on hover)
     await expect(page.locator('.edge-label')).toBeHidden()
@@ -155,7 +155,7 @@ test.describe('GridSim Application', () => {
   })
 
   test('should be able to zoom and pan the canvas', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
+    await page.goto('/?mockdata=e2e')
 
     // Wait for canvas to load
     await page.waitForSelector('.react-flow__viewport', { timeout: 5000 })
@@ -177,7 +177,7 @@ test.describe('GridSim Application', () => {
   })
 
   test('should have proper accessibility attributes', async ({ page }) => {
-    await page.goto('/?mockData=e2e')
+    await page.goto('/?mockdata=e2e')
 
     // Check that buttons have proper accessibility
     const modeButtons = page.locator('.mode-button')
