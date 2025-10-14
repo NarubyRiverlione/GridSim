@@ -146,6 +146,17 @@ export const GridCanvas = ({
     prevEdgesRef.current = edgesData
   }, [edgesData, setEdges])
 
+  // Handle node hover - show component details
+  const handleNodeMouseEnter = useCallback(
+    (_event: React.MouseEvent, node: Node): void => {
+      if (node.id === GHOST_NODE_ID) return
+
+      const component = node.data as Component
+      onComponentSelect(component)
+    },
+    [onComponentSelect]
+  )
+
   // Handle node selection or line drawing
   const handleNodeClick = useCallback(
     (_event: React.MouseEvent, node: Node): void => {
@@ -180,14 +191,11 @@ export const GridCanvas = ({
 
         // Then update the line drawing state
         onNodeClickForLine(component)
-      } else {
-        // Otherwise, select the component
-        onComponentSelect(component)
       }
+      // Click no longer selects in select mode - hover does that
     },
     [
       mode,
-      onComponentSelect,
       onNodeClickForLine,
       lineDrawingState,
       onLineAdd,
@@ -198,6 +206,14 @@ export const GridCanvas = ({
       onPlacementBlocked,
       placementBuffer,
     ]
+  )
+
+  // Handle edge hover - show line details
+  const handleEdgeMouseEnter = useCallback(
+    (_event: React.MouseEvent, edge: Edge): void => {
+      onComponentSelect(edge.data as TransmissionLine)
+    },
+    [onComponentSelect]
   )
 
   // Handle edge selection
@@ -335,7 +351,9 @@ export const GridCanvas = ({
           }
         }}
         onNodeClick={handleNodeClick}
+        onNodeMouseEnter={handleNodeMouseEnter}
         onEdgeClick={handleEdgeClick}
+        onEdgeMouseEnter={handleEdgeMouseEnter}
         onPaneClick={handlePaneClick}
         nodeTypes={stableNodeTypes}
         edgeTypes={stableEdgeTypes}
