@@ -33,6 +33,11 @@ export enum VoltageLevel {
   KV33 = 33,
 }
 
+export enum SubstationType {
+  Grid = 'grid',
+  Zone = 'zone',
+}
+
 export enum ComponentState {
   Healthy = 'healthy',
   Stressed = 'stressed',
@@ -47,4 +52,5 @@ export enum InteractionMode {
   AddTransmissionLine = 'add-transmission-line',
   AddSubstation = 'add-substation',
   AddSwitchingStation = 'add-switching-station',
+  AddPylon = 'add-pylon',
 }

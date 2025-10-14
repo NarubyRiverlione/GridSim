@@ -51,7 +51,7 @@ Browser-based web application (TypeScript/React) running entirely client-side wi
 
 **Initial State**:
 
-- 1 power plant (e.g., 800 MW CCGT)
+- 1 power plant (e.g., CCGT default 600 MW)
 - 1 small city (30 MW demand)
 - NOT connected
 - Starting budget: €50M

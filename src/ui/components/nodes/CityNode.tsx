@@ -13,8 +13,18 @@ export const CityNode = memo(({ data }: NodeProps<City>) => {
   const stateColor = getStateColor(data.state)
   const deliveryPercentage = data.connected ? Math.round((data.powerReceived / data.currentDemand) * 100) : 0
 
+  // Container size = icon size + padding (8px × 2) + border (2px × 2)
+  const containerSize = radius * 2 + 8 * 2 + 2 * 2
+
   return (
-    <div className="custom-node city-node" style={{ borderColor: stateColor }}>
+    <div
+      className="custom-node city-node"
+      style={{
+        borderColor: stateColor,
+        width: `${containerSize}px`,
+        height: `${containerSize}px`,
+      }}
+    >
       <Handle type="target" position={Position.Left} />
       <div
         className="node-icon city-icon"

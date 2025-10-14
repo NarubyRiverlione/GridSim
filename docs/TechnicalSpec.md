@@ -2,6 +2,14 @@
 
 This document covers the technical architecture, implementation details, and development approach.
 
+V1 Modeling Assumptions (technical)
+
+- Power factor for V1 is assumed to be 1.0 (pf = 1.0). Therefore, MVA == MW for capacity, load and loss calculations in V1. This simplifies the simulation and keeps units consistent across physics and economy code.
+- Voltage magnitudes and reactive power are not modeled by the primary solver. A lightweight DC-style solver computes flows and currents; a separate gameplay heuristic may be applied to represent voltage-drop effects (see PhysicsSpec.md).
+- tick(deltaSeconds: number) is the canonical simulation tick unit used by the engine. Higher-level systems convert ticks to hours/MWh for economy calculations where needed.
+- Substation voltages are fixed types (grid: 400→220 kV, zone: 220→110 kV). The engine validates allowed voltage transformations and prevents skipping levels.
+- API methods that accept voltages or arbitrary values will be validated by the engine to enforce V1 constraints (no arbitrary voltages, no skipping).
+
 ---
 
 ## 1. Technology Stack
@@ -66,13 +74,14 @@ class GridSimulation {
   // Player commands
   addPowerPlant(type: PlantType, location: Point, capacity: number): Result
   addTransmissionLine(from: NodeId, to: NodeId, path: Point[]): Result
-  addSubstation(location: Point, voltageIn: number, voltageOut: number): Result
+  // V1: substation types are restricted. Use type to create validated substations.
+  addSubstation(type: 'grid' | 'zone', location: Point, capacity: number): Result
   addSwitchingStation(location: Point): Result
   setBreakerState(stationId: string, breakerId: string, closed: boolean): Result
   setElectricityPrice(pricePerMWh: number): void
 
-  // Time control
-  tick(deltaTime: number): void
+  // Time control (tick units: seconds)
+  tick(deltaSeconds: number): void
   pause(): void
   resume(): void
   setSpeed(multiplier: number): void
@@ -362,11 +371,17 @@ export function useSimulation() {
   const [gridState, setGridState] = useState<GridState>(simulation.getState())
 
   useEffect(() => {
+    let lastTime = performance.now()
+
     const interval = setInterval(() => {
-      const currentTime = performance.now()
-      simulation.tick(currentTime)
+      const now = performance.now()
+      const deltaSeconds = (now - lastTime) / 1000
+      lastTime = now
+
+      // tick expects seconds (deltaSeconds). Simulation internal speed multiplier applies as needed.
+      simulation.tick(deltaSeconds)
       setGridState(simulation.getState())
-    }, 16) // 60 FPS
+    }, 1000 / 60) // ~60Hz simulation driver
 
     return () => clearInterval(interval)
   }, [simulation])

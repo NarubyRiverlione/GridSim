@@ -16,14 +16,15 @@ export const ModeSwitcher = ({ currentMode, onModeChange }: ModeSwitcherProps): 
     { id: InteractionMode.Select, label: 'Select', icon: '👆' },
     { id: InteractionMode.AddPowerPlant, label: 'Power Plant', icon: '⚡' },
     { id: InteractionMode.AddCity, label: 'City', icon: '🏙️' },
-    { id: InteractionMode.AddTransmissionLine, label: 'Line', icon: '⚡' },
-    { id: InteractionMode.AddSubstation, label: 'Substation', icon: '⚙️' },
+    { id: InteractionMode.AddTransmissionLine, label: 'Line', icon: '🗼' },
+    { id: InteractionMode.AddSubstation, label: 'Substation', icon: '🏭' },
     { id: InteractionMode.AddSwitchingStation, label: 'Switching', icon: '🔀' },
+    { id: InteractionMode.AddPylon, label: 'Pylon', icon: '⚡' },
   ]
 
   return (
     <div className="mode-switcher">
-      <div className="mode-switcher-title">Tool Mode</div>
+      {/* <div className="mode-switcher-title">Tool Mode</div> */}
       <div className="mode-buttons">
         {modes.map(mode => (
           <button

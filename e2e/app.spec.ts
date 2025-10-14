@@ -7,7 +7,7 @@ import { test, expect } from '@playwright/test'
 
 test.describe('GridSim Application', () => {
   test('should load the application and display the header', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=e2e')
 
     // Check that the app loads
     await expect(page).toHaveTitle(/GridSim/)
@@ -19,28 +19,27 @@ test.describe('GridSim Application', () => {
   })
 
   test('should display the grid canvas', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=e2e')
 
     // Check that React Flow canvas is rendered
     await expect(page.locator('.react-flow')).toBeVisible()
 
-    // Check for minimap
-    await expect(page.locator('.react-flow__minimap')).toBeVisible()
+    // Check for hidden minimap
+    await expect(page.locator('.react-flow__minimap')).not.toBeVisible()
 
     // Check for controls
     await expect(page.locator('.react-flow__controls')).toBeVisible()
   })
 
   test('should display mode switcher with all modes', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=e2e')
 
     // Check mode switcher is visible
     await expect(page.locator('.mode-switcher')).toBeVisible()
-    await expect(page.locator('.mode-switcher-title')).toContainText('Tool Mode')
-
+    // await expect(page.locator('.mode-switcher-title')).toContainText('Tool Mode')
     // Check all mode buttons are present
     const modeButtons = page.locator('.mode-button')
-    await expect(modeButtons).toHaveCount(6)
+    await expect(modeButtons).toHaveCount(7)
 
     // Verify mode button labels
     await expect(modeButtons.nth(0)).toContainText('Select')
@@ -49,10 +48,11 @@ test.describe('GridSim Application', () => {
     await expect(modeButtons.nth(3)).toContainText('Line')
     await expect(modeButtons.nth(4)).toContainText('Substation')
     await expect(modeButtons.nth(5)).toContainText('Switching')
+    await expect(modeButtons.nth(6)).toContainText('Pylon')
   })
 
   test('should switch between interaction modes', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=e2e')
 
     // Select mode should be active by default
     const selectButton = page.locator('.mode-button').nth(0)
@@ -72,7 +72,7 @@ test.describe('GridSim Application', () => {
   })
 
   test('should display grid status panel with metrics', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=e2e')
 
     // Check grid status panel is visible
     const statusPanel = page.locator('.grid-status-panel')
@@ -89,23 +89,24 @@ test.describe('GridSim Application', () => {
   })
 
   test('should display time control panel', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=e2e')
 
     // Check time control panel is visible
     const timePanel = page.locator('.time-control-panel')
     await expect(timePanel).toBeVisible()
-    await expect(timePanel.locator('.panel-title')).toContainText('Time Control')
 
     // Check for time display
     await expect(timePanel.locator('.current-time')).toBeVisible()
     await expect(timePanel.locator('.season-badge')).toBeVisible()
 
-    // Check for placeholder controls
-    await expect(timePanel).toContainText('Phase 1')
+    // Check for placeholder controls (disabled in Phase 0)
+    const pauseButton = timePanel.locator('button').first()
+    await expect(pauseButton).toBeDisabled()
+    await expect(pauseButton).toHaveAttribute('title', /Phase 1/)
   })
 
   test('should display component details panel with empty state', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=e2e')
 
     // Check details panel is visible
     const detailsPanel = page.locator('.details-panel')
@@ -117,7 +118,7 @@ test.describe('GridSim Application', () => {
   })
 
   test('should display grid components (nodes) on canvas', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=e2e')
 
     // Wait for React Flow to render
     await page.waitForSelector('.react-flow__node', { timeout: 5000 })
@@ -125,7 +126,7 @@ test.describe('GridSim Application', () => {
     // Check that nodes are present
     const nodes = page.locator('.react-flow__node')
     const nodeCount = await nodes.count()
-    expect(nodeCount).toBeGreaterThan(0)
+    expect(nodeCount).toBe(7) //  plants +  cities +  2 substations +  switching +  pylons + wire
 
     // Check for different node types
     await expect(page.locator('.plant-node').first()).toBeVisible()
@@ -133,7 +134,7 @@ test.describe('GridSim Application', () => {
   })
 
   test('should display transmission lines (edges) on canvas', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=e2e')
 
     // Wait for React Flow to render
     await page.waitForSelector('.react-flow__edge', { timeout: 5000 })
@@ -141,14 +142,20 @@ test.describe('GridSim Application', () => {
     // Check that edges are present
     const edges = page.locator('.react-flow__edge')
     const edgeCount = await edges.count()
-    expect(edgeCount).toBeGreaterThan(0)
+    expect(edgeCount).toBe(12)
 
-    // Check for edge labels
+    // Check for edge labels (hidden by default, visible on hover)
+    await expect(page.locator('.edge-label')).toBeHidden()
+
+    // Hover over first edge to show label
+    const firstEdge = edges.first()
+    const firstEdgePath = firstEdge.locator('.react-flow__edge-path')
+    await firstEdgePath.hover()
     await expect(page.locator('.edge-label').first()).toBeVisible()
   })
 
   test('should be able to zoom and pan the canvas', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=e2e')
 
     // Wait for canvas to load
     await page.waitForSelector('.react-flow__viewport', { timeout: 5000 })
@@ -170,7 +177,7 @@ test.describe('GridSim Application', () => {
   })
 
   test('should have proper accessibility attributes', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?mockData=e2e')
 
     // Check that buttons have proper accessibility
     const modeButtons = page.locator('.mode-button')

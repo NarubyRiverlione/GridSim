@@ -1,0 +1,45 @@
+/**
+ * Error toast styles
+ */
+
+.error-toast {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: rgba(220, 38, 38, 0.95);
+  color: white;
+  padding: 16px 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10000;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  max-width: 500px;
+}
+
+.error-toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+.error-toast-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.error-toast-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.error-toast-text {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+}

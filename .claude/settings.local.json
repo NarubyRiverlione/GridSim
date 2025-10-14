@@ -1,14 +1,20 @@
 {
   "permissions": {
     "allow": [
-      "Bash(do sed -i '' \"1,/^import/s/^import/import React from ''react''\\nimport/\" \"$file\")",
-      "Bash(pnpm build)",
       "Bash(pnpm exec playwright:*)",
-      "Bash(pnpm test:e2e:*)",
-      "Bash(timeout 10 pnpm dev:*)",
-      "Bash(pnpm test:e2e:update-snapshots:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git merge:*)",
+      "Bash(pnpm run:*)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(pnpm test:e2e:*)",
+      "Bash(cat:*)",
+      "Bash(python3:*)",
+      "Bash(pnpm test:e2e:report:*)",
+      "Bash(tree:*)",
+      "Bash(for f in src/utils/componentUtils.ts src/utils/componentSpecs.ts src/utils/componentFactory.ts src/utils/lineFactory.ts src/ui/components/canvas/gridCanvasUtils.ts src/ui/components/panels/componentRenderers.tsx src/ui/components/toolbar/buildMenuComponents.tsx)",
+      "Bash(done)",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []
