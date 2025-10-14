@@ -3,18 +3,32 @@
  */
 
 import { memo } from 'react'
-import { Handle, Position, type NodeProps } from 'reactflow'
-import type { PowerPlant } from '@/types'
+import { Handle, type NodeProps } from 'reactflow'
+import type { PowerPlant, TransmissionLine } from '@/types'
 import { getPlantColor, getStateColor } from '@/ui/utils/colors'
+import { getHandleAvailability } from '@/utils/connectionRules'
 import './NodeStyles.css'
 
-export const PowerPlantNode = memo(({ data }: NodeProps<PowerPlant>) => {
+interface PowerPlantNodeData extends PowerPlant {
+  transmissionLines: TransmissionLine[]
+}
+
+export const PowerPlantNode = memo(({ data }: NodeProps<PowerPlantNodeData>) => {
   const plantColor = getPlantColor(data.type)
   const stateColor = getStateColor(data.state)
+  const handles = getHandleAvailability(data, data.transmissionLines)
 
   return (
     <div className="custom-node plant-node" style={{ borderColor: stateColor }}>
-      <Handle type="source" position={Position.Right} />
+      {handles.map(handle => (
+        <Handle
+          key={handle.id}
+          type={handle.type}
+          position={handle.position}
+          isConnectable={handle.enabled}
+          className={handle.enabled ? 'handle-enabled' : 'handle-disabled'}
+        />
+      ))}
       <div className="node-icon" style={{ backgroundColor: plantColor }}>
         <span className="icon-text">⚡</span>
       </div>

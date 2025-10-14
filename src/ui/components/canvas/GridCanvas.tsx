@@ -92,7 +92,7 @@ export const GridCanvas = ({
   }, [placementBuffer])
 
   // Convert components to React Flow nodes
-  const componentNodes: Node[] = useMemo(() => componentsToNodes(components), [components])
+  const componentNodes: Node[] = useMemo(() => componentsToNodes(components, transmissionLines), [components, transmissionLines])
 
   // Add ghost node if placing
   const allNodes = useMemo(() => {

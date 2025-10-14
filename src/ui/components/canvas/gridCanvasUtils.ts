@@ -13,12 +13,15 @@ export const GHOST_NODE_ID = 'ghost-preview-node'
 /**
  * Convert components to React Flow nodes
  */
-export const componentsToNodes = (components: Component[]): Node[] => {
+export const componentsToNodes = (components: Component[], transmissionLines: TransmissionLine[]): Node[] => {
   return components.map(component => ({
     id: component.id,
     type: getNodeType(component),
     position: component.location,
-    data: component,
+    data: {
+      ...component,
+      transmissionLines, // Pass transmission lines for handle availability calculation
+    },
   }))
 }
 

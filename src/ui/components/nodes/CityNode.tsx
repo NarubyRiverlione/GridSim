@@ -3,15 +3,21 @@
  */
 
 import { memo } from 'react'
-import { Handle, Position, type NodeProps } from 'reactflow'
-import type { City } from '@/types'
+import { Handle, type NodeProps } from 'reactflow'
+import type { City, TransmissionLine } from '@/types'
 import { getCitySizeRadius, getStateColor } from '@/ui/utils/colors'
+import { getHandleAvailability } from '@/utils/connectionRules'
 import './NodeStyles.css'
 
-export const CityNode = memo(({ data }: NodeProps<City>) => {
+interface CityNodeData extends City {
+  transmissionLines: TransmissionLine[]
+}
+
+export const CityNode = memo(({ data }: NodeProps<CityNodeData>) => {
   const radius = getCitySizeRadius(data.size)
   const stateColor = getStateColor(data.state)
   const deliveryPercentage = data.connected ? Math.round((data.powerReceived / data.currentDemand) * 100) : 0
+  const handles = getHandleAvailability(data, data.transmissionLines)
 
   // Container size = icon size + padding (8px × 2) + border (2px × 2)
   const containerSize = radius * 2 + 8 * 2 + 2 * 2
@@ -25,7 +31,15 @@ export const CityNode = memo(({ data }: NodeProps<City>) => {
         height: `${containerSize}px`,
       }}
     >
-      <Handle type="target" position={Position.Left} />
+      {handles.map(handle => (
+        <Handle
+          key={handle.id}
+          type={handle.type}
+          position={handle.position}
+          isConnectable={handle.enabled}
+          className={handle.enabled ? 'handle-enabled' : 'handle-disabled'}
+        />
+      ))}
       <div
         className="node-icon city-icon"
         style={{

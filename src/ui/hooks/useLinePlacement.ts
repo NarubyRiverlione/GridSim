@@ -6,6 +6,7 @@ import { useState, useCallback } from 'react'
 import type { Component, TransmissionLine, Point } from '@/types'
 import { InteractionMode } from '@/types'
 import { isCity, getComponentVoltage } from '@/utils/componentUtils'
+import { canAcceptConnection } from '@/utils/connectionRules'
 
 export interface LineDrawingState {
   isDrawing: boolean
@@ -55,6 +56,17 @@ export const useLinePlacement = ({ mode, existingLines }: UseLinePlacementProps)
       // Can't connect two cities
       if (isCity(source) && isCity(target)) {
         return { valid: false, error: 'Cannot connect two cities directly' }
+      }
+
+      // Check connection capacity FIRST (before other validations)
+      const sourceCapacityCheck = canAcceptConnection(source, existingLines, 'source')
+      if (!sourceCapacityCheck.allowed) {
+        return { valid: false, error: sourceCapacityCheck.reason }
+      }
+
+      const targetCapacityCheck = canAcceptConnection(target, existingLines, 'target')
+      if (!targetCapacityCheck.allowed) {
+        return { valid: false, error: targetCapacityCheck.reason }
       }
 
       // Check if line already exists

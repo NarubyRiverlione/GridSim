@@ -115,10 +115,35 @@
   height: 8px;
   background: #3b82f6;
   border: 2px solid white;
+  transition: all 0.2s ease;
 }
 
 .react-flow__handle:hover {
   background: #2563eb;
+}
+
+/* Handle enabled state */
+.react-flow__handle.handle-enabled {
+  opacity: 1;
+  cursor: crosshair;
+  background: #3b82f6;
+}
+
+.react-flow__handle.handle-enabled:hover {
+  background: #2563eb;
+  transform: scale(1.2);
+}
+
+/* Handle disabled state */
+.react-flow__handle.handle-disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background-color: #6b7280 !important;
+  pointer-events: none;
+}
+
+.react-flow__handle.handle-disabled:hover {
+  transform: none;
 }
 
 /* Ghost node styles for placement preview */

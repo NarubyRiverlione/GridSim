@@ -3,21 +3,32 @@
  */
 
 import { memo } from 'react'
-import { Handle, Position, type NodeProps } from 'reactflow'
-import type { SwitchingStation } from '@/types'
+import { Handle, type NodeProps } from 'reactflow'
+import type { SwitchingStation, TransmissionLine } from '@/types'
 import { getStateColor } from '@/ui/utils/colors'
+import { getHandleAvailability } from '@/utils/connectionRules'
 import './NodeStyles.css'
 
-export const SwitchingStationNode = memo(({ data }: NodeProps<SwitchingStation>) => {
+interface SwitchingStationNodeData extends SwitchingStation {
+  transmissionLines: TransmissionLine[]
+}
+
+export const SwitchingStationNode = memo(({ data }: NodeProps<SwitchingStationNodeData>) => {
   const stateColor = getStateColor(data.state)
   const closedBreakers = data.breakers.filter(b => b.closed && !b.tripped).length
+  const handles = getHandleAvailability(data, data.transmissionLines)
 
   return (
     <div className="custom-node switching-node" style={{ borderColor: stateColor }}>
-      <Handle type="target" position={Position.Left} />
-      <Handle type="source" position={Position.Right} />
-      <Handle type="source" position={Position.Top} />
-      <Handle type="source" position={Position.Bottom} />
+      {handles.map(handle => (
+        <Handle
+          key={handle.id}
+          type={handle.type}
+          position={handle.position}
+          isConnectable={handle.enabled}
+          className={handle.enabled ? 'handle-enabled' : 'handle-disabled'}
+        />
+      ))}
       <div className="node-icon" style={{ backgroundColor: '#6366f1' }}>
         <span className="icon-text">🔀</span>
       </div>
