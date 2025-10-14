@@ -25,18 +25,19 @@ export const BuildMenu = ({
   onPlantTypeChange,
   onCitySizeChange,
   onSubstationTypeChange,
-}: BuildMenuProps): React.ReactElement => {
-  let modeSpecificMenu: React.ReactElement | null = null
-
-  if (currentMode === InteractionMode.AddPowerPlant) {
-    modeSpecificMenu = <PlantTypeMenu selectedType={selectedPlantType} onTypeChange={onPlantTypeChange} />
-  } else if (currentMode === InteractionMode.AddCity) {
-    modeSpecificMenu = <CitySizeMenu selectedSize={selectedCitySize} onSizeChange={onCitySizeChange} />
-  } else if (currentMode === InteractionMode.AddSubstation) {
-    modeSpecificMenu = (
+}: BuildMenuProps): React.ReactElement | null => {
+  const menu =
+    currentMode === InteractionMode.AddPowerPlant ? (
+      <PlantTypeMenu selectedType={selectedPlantType} onTypeChange={onPlantTypeChange} />
+    ) : currentMode === InteractionMode.AddCity ? (
+      <CitySizeMenu selectedSize={selectedCitySize} onSizeChange={onCitySizeChange} />
+    ) : currentMode === InteractionMode.AddSubstation ? (
       <SubstationTypeMenu selectedType={selectedSubstationType} onTypeChange={onSubstationTypeChange} />
-    )
+    ) : null
+
+  if (!menu) {
+    return null
   }
 
-  return <div>{modeSpecificMenu}</div>
+  return <div>{menu}</div>
 }

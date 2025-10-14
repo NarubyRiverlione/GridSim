@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test'
 // Capture console messages while moving the mouse across the canvas to detect re-render frequency
 
 test('capture edge render logs during mouse move', async ({ page }) => {
-  await page.goto('/?mockData=complex')
+  await page.goto('/?mockData=e2e')
   await page.waitForSelector('.react-flow__pane', { timeout: 5000 })
 
   const logs: string[] = []

@@ -348,7 +348,7 @@ export const GridCanvas = ({
       >
         <Background />
         <Controls />
-        <MiniMap nodeStrokeWidth={3} zoomable pannable />
+        {/* <MiniMap nodeStrokeWidth={3} zoomable pannable /> */}
       </ReactFlow>
     </div>
   )

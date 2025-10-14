@@ -15,8 +15,8 @@ import * as complexMockData from './data/mockData.complex'
 import type { Component, TransmissionLine } from './types'
 import './App.css'
 
-// Check if complex mock data should be loaded via query parameter
-const useComplexMockData = new URLSearchParams(window.location.search).get('mockData') === 'complex'
+// Check if complex mock data should be loaded via query parameter (mode=e2e)
+const useComplexMockData = new URLSearchParams(window.location.search).get('mockdata') === 'e2e'
 const mockData = useComplexMockData ? complexMockData : simpleMockData
 
 const {

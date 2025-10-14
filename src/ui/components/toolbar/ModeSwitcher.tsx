@@ -24,7 +24,7 @@ export const ModeSwitcher = ({ currentMode, onModeChange }: ModeSwitcherProps): 
 
   return (
     <div className="mode-switcher">
-      <div className="mode-switcher-title">Tool Mode</div>
+      {/* <div className="mode-switcher-title">Tool Mode</div> */}
       <div className="mode-buttons">
         {modes.map(mode => (
           <button

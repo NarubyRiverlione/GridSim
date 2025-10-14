@@ -6,7 +6,7 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Component Placement System', () => {
   test('should switch to power plant placement mode', async ({ page }) => {
-    await page.goto('/?mockData=complex')
+    await page.goto('/?mockData=e2e')
     await page.waitForSelector('.mode-switcher', { timeout: 5000 })
 
     // Click power plant mode button
@@ -18,7 +18,7 @@ test.describe('Component Placement System', () => {
   })
 
   test('should show ghost preview when hovering in placement mode', async ({ page }) => {
-    await page.goto('/?mockData=complex')
+    await page.goto('/?mockData=e2e')
     await page.waitForSelector('.mode-switcher', { timeout: 5000 })
 
     // Switch to power plant mode
@@ -37,7 +37,7 @@ test.describe('Component Placement System', () => {
   })
 
   test('should place a power plant on click', async ({ page }) => {
-    await page.goto('/?mockData=complex')
+    await page.goto('/?mockData=e2e')
     await page.waitForSelector('.react-flow__node', { timeout: 5000 })
 
     // Count initial power plant nodes
@@ -62,7 +62,7 @@ test.describe('Component Placement System', () => {
   })
 
   test('should select plant type before placing', async ({ page }) => {
-    await page.goto('/?mockData=complex')
+    await page.goto('/?mockData=e2e')
     await page.waitForSelector('.mode-switcher', { timeout: 5000 })
 
     // Switch to power plant mode
@@ -85,7 +85,7 @@ test.describe('Component Placement System', () => {
   })
 
   test('should place a city with selected size', async ({ page }) => {
-    await page.goto('/?mockData=complex')
+    await page.goto('/?mockData=e2e')
     await page.waitForSelector('.mode-switcher', { timeout: 5000 })
 
     // Count initial city nodes
@@ -130,7 +130,7 @@ test.describe('Component Placement System', () => {
   })
 
   test('should place substation with type selection', async ({ page }) => {
-    await page.goto('/?mockData=complex')
+    await page.goto('/?mockData=e2e')
     await page.waitForSelector('.mode-switcher', { timeout: 5000 })
 
     // Count initial substation nodes
@@ -169,7 +169,7 @@ test.describe('Component Placement System', () => {
   })
 
   test('should place switching station', async ({ page }) => {
-    await page.goto('/?mockData=complex')
+    await page.goto('/?mockData=e2e')
     await page.waitForSelector('.mode-switcher', { timeout: 5000 })
     // Count switching nodes by type
     const switchingSelector = '.switching-node'
@@ -188,7 +188,7 @@ test.describe('Component Placement System', () => {
   })
 
   test('should place pylon', async ({ page }) => {
-    await page.goto('/?mockData=complex')
+    await page.goto('/?mockData=e2e')
     await page.waitForSelector('.mode-switcher', { timeout: 5000 })
     // Count pylons by node type
     const pylonSelector = '.pylon-node'
@@ -200,7 +200,7 @@ test.describe('Component Placement System', () => {
 
     // Place pylon
     const canvas = page.locator('.react-flow__pane')
-    await canvas.click({ position: { x: 450, y: 250 }, force: true })
+    await canvas.click({ position: { x: 100, y: 250 }, force: true })
 
     // Wait for pylon node to appear
     await expect(page.locator(pylonSelector)).toHaveCount(initialPylonCount + 1, { timeout: 2000 })

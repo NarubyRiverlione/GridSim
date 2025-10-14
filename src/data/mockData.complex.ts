@@ -52,7 +52,7 @@ export const mockCities: City[] = [
     id: 'city-1',
     name: 'Berlin',
     size: CitySize.MajorMetro,
-    location: { x: 100, y: 500 },
+    location: { x: 10, y: 500 },
     baseDemand: 3000,
     currentDemand: 2800,
     powerReceived: 2800,
@@ -144,7 +144,7 @@ export const mockTransmissionLines: TransmissionLine[] = [
   },
   {
     id: 'line-5',
-    from: 'pylon-1',
+    from: 'substation-Z1',
     to: 'city-1',
     path: [
       { x: 200, y: 400 },
@@ -266,7 +266,7 @@ export const mockSubstations: Substation[] = [
   },
   {
     id: 'substation-Z1',
-    location: { x: 300, y: 300 },
+    location: { x: 300, y: 600 },
     substationType: SubstationType.Zone,
     voltageIn: VoltageLevel.KV220,
     voltageOut: VoltageLevel.KV110,
@@ -329,7 +329,7 @@ export const mockSubstations: Substation[] = [
 export const mockSwitchingStations: SwitchingStation[] = [
   {
     id: 'switching-1',
-    location: { x: 450, y: 200 },
+    location: { x: 600, y: 600 },
     breakers: [
       { id: 'breaker-sw-1', closed: true, tripped: false },
       { id: 'breaker-sw-2', closed: true, tripped: false },
@@ -343,7 +343,7 @@ export const mockSwitchingStations: SwitchingStation[] = [
 export const mockPylons: Pylon[] = [
   {
     id: 'pylon-1',
-    location: { x: 200, y: 400 },
+    location: { x: 100, y: 300 },
     maxLines: 4,
     connectedLines: ['line-4', 'line-5', 'line-9'],
     voltageLevel: VoltageLevel.KV110,
@@ -351,7 +351,7 @@ export const mockPylons: Pylon[] = [
   },
   {
     id: 'pylon-2',
-    location: { x: 600, y: 400 },
+    location: { x: 300, y: 400 },
     maxLines: 4,
     connectedLines: ['line-10'],
     voltageLevel: VoltageLevel.KV220,
