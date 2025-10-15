@@ -101,16 +101,23 @@ export const App = (): React.ReactElement => {
 
   // Handler for adding new transmission lines
   const handleLineAdd = (source: Component, target: Component): void => {
+    console.log('App.handleLineAdd called:', source.id, '->', target.id)
+
     // Check if connection is valid
     const validation = linePlacement.canConnectNodes(source, target)
+    console.log('App.handleLineAdd validation:', validation)
 
     if (!validation.valid) {
+      console.log('App.handleLineAdd: validation failed, not adding line')
       // Error is already set in lineDrawingState by handleNodeClickForLine
       return
     }
 
     const newLine = createTransmissionLine(source, target)
+    console.log('App.handleLineAdd: created new line:', newLine)
+    console.log('App.handleLineAdd: current transmissionLines.length=', transmissionLines.length)
     setTransmissionLines([...transmissionLines, newLine])
+    console.log('App.handleLineAdd: setTransmissionLines called with', transmissionLines.length + 1, 'lines')
   }
 
   // Handler to persist node drag positions

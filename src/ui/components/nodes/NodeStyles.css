@@ -26,8 +26,32 @@
   height: auto !important;
 }
 
-/* Disable node expansion when in line drawing mode */
-[data-mode="add-transmission-line"] .custom-node:hover {
+/* City nodes have dynamic size, preserve it in line drawing mode */
+/* This MUST come before the general .custom-node rule for proper specificity */
+[data-mode='add-transmission-line'] .city-node.custom-node:hover {
+  /* City nodes need to preserve their dynamic inline style width/height */
+  /* Use higher specificity to ensure this rule wins */
+  padding: 8px !important;
+  gap: 0 !important;
+  justify-content: center !important;
+  transform: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* City nodes have dynamic size, preserve it in line drawing mode */
+/* This MUST come before the general .custom-node rule for proper specificity */
+[data-mode='add-transmission-line'] .city-node.custom-node:hover {
+  /* City nodes need to preserve their dynamic inline style width/height */
+  /* Use higher specificity to ensure this rule wins */
+  padding: 8px !important;
+  gap: 0 !important;
+  justify-content: center !important;
+  transform: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Disable node expansion when in line drawing mode (non-city nodes) */
+[data-mode='add-transmission-line'] .custom-node:not(.city-node):hover {
   padding: 8px !important;
   gap: 0 !important;
   justify-content: center !important;
@@ -37,18 +61,8 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
 }
 
-/* City nodes have dynamic size, preserve it in line drawing mode */
-[data-mode="add-transmission-line"] .city-node:hover {
-  /* City nodes need to preserve their dynamic inline style width/height */
-  padding: 8px !important;
-  gap: 0 !important;
-  justify-content: center !important;
-  transform: none !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-}
-
 /* Hide node content on hover when in line drawing mode */
-[data-mode="add-transmission-line"] .custom-node:hover .node-content {
+[data-mode='add-transmission-line'] .custom-node:hover .node-content {
   max-width: 0 !important;
   opacity: 0 !important;
   margin-left: 0 !important;
@@ -139,39 +153,53 @@
 
 /* React Flow handle customization */
 .react-flow__handle {
-  width: 8px;
-  height: 8px;
-  background: #3b82f6;
-  border: 2px solid white;
+  width: 20px;
+  height: 20px;
+  border: 3px solid white;
+  border-radius: 50%;
   transition: all 0.2s ease;
 }
 
-.react-flow__handle:hover {
-  background: #2563eb;
+/* Adjust handle positioning so the CENTER of the circle aligns with the border */
+.react-flow__handle-left {
+  left: -10px; /* Half of handle width (20px / 2) */
+}
+
+.react-flow__handle-right {
+  right: -10px; /* Half of handle width (20px / 2) */
+}
+
+.react-flow__handle-top {
+  top: -10px; /* Half of handle height (20px / 2) */
+}
+
+.react-flow__handle-bottom {
+  bottom: -10px; /* Half of handle height (20px / 2) */
+}
+
+.react-flow__handle.target {
+  background: #ef4444; /* Red for targets (power flows IN) */
+}
+.react-flow__handle.source {
+  background: #3b82f6; /* Blue for sources (power flows OUT) */
 }
 
 /* Handle enabled state */
 .react-flow__handle.handle-enabled {
   opacity: 1;
   cursor: crosshair;
-  background: #3b82f6;
 }
 
 .react-flow__handle.handle-enabled:hover {
-  background: #2563eb;
-  transform: scale(1.2);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Handle disabled state */
+/* Handle disabled state - HIDDEN */
 .react-flow__handle.handle-disabled {
-  opacity: 0.3;
+  opacity: 0;
   cursor: not-allowed;
-  background-color: #6b7280 !important;
   pointer-events: none;
-}
-
-.react-flow__handle.handle-disabled:hover {
-  transform: none;
+  display: none;
 }
 
 /* Ghost node styles for placement preview */

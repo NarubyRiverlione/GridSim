@@ -9,6 +9,7 @@ import ReactFlow, {
   MiniMap,
   type Node,
   type Edge,
+  type Connection,
   useNodesState,
   useEdgesState,
   useReactFlow,
@@ -108,7 +109,10 @@ export const GridCanvas = ({
   }, [componentNodes, placementState, mode, placementConfig])
 
   // Convert transmission lines to React Flow edges
-  const edgesData: Edge[] = useMemo(() => linesToEdges(transmissionLines), [transmissionLines])
+  const edgesData: Edge[] = useMemo(() => {
+    console.debug('GridCanvas: linesToEdges called, transmissionLines.length=', transmissionLines.length)
+    return linesToEdges(transmissionLines)
+  }, [transmissionLines])
 
   const [nodes, setNodes, onNodesChange] = useNodesState(allNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState(edgesData)
@@ -160,6 +164,8 @@ export const GridCanvas = ({
   // Handle node selection or line drawing
   const handleNodeClick = useCallback(
     (_event: React.MouseEvent, node: Node): void => {
+      console.log('GridCanvas.handleNodeClick: CALLED! node.id=', node.id, 'mode=', mode)
+
       if (node.id === GHOST_NODE_ID) return
 
       const component = node.data as Component
@@ -184,9 +190,15 @@ export const GridCanvas = ({
 
       // If in line drawing mode, handle line placement
       if (mode === InteractionMode.AddTransmissionLine) {
+        console.log('GridCanvas.handleNodeClick: in line drawing mode, clicked node:', component.id)
+        console.log('GridCanvas.handleNodeClick: lineDrawingState:', lineDrawingState)
+
         // If completing a line (second click), create it first
         if (lineDrawingState.isDrawing && lineDrawingState.sourceNode !== null) {
+          console.log('GridCanvas.handleNodeClick: completing line from', lineDrawingState.sourceNode.id, 'to', component.id)
           onLineAdd(lineDrawingState.sourceNode, component)
+        } else {
+          console.log('GridCanvas.handleNodeClick: starting line from', component.id)
         }
 
         // Then update the line drawing state
@@ -293,6 +305,31 @@ export const GridCanvas = ({
     [onMouseMove, onMouseMoveForLine, screenToFlowPosition]
   )
 
+  // Handle React Flow connections (drag from handle to handle)
+  const handleConnect = useCallback(
+    (connection: Connection): void => {
+      console.log('GridCanvas.handleConnect: connection=', connection)
+
+      if (!connection.source || !connection.target) {
+        console.log('GridCanvas.handleConnect: missing source or target')
+        return
+      }
+
+      // Find the source and target components
+      const sourceComponent = components.find(c => c.id === connection.source)
+      const targetComponent = components.find(c => c.id === connection.target)
+
+      if (!sourceComponent || !targetComponent) {
+        console.log('GridCanvas.handleConnect: could not find components')
+        return
+      }
+
+      console.log('GridCanvas.handleConnect: calling onLineAdd')
+      onLineAdd(sourceComponent, targetComponent)
+    },
+    [components, onLineAdd]
+  )
+
   return (
     <div
       className="grid-canvas"
@@ -305,6 +342,7 @@ export const GridCanvas = ({
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
+        onConnect={mode === InteractionMode.AddTransmissionLine ? handleConnect : undefined}
         onNodeDrag={(_event, node) => {
           if (node.id === GHOST_NODE_ID) return
           const pos = node.position as { x?: number; y?: number } | undefined

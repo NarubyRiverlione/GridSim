@@ -39,28 +39,26 @@ export function getConnectionCounts(componentId: string, lines: TransmissionLine
  * Get connection limits for a component type
  */
 export function getMaxConnections(component: Component): ConnectionLimits {
-  if (isPowerPlant(component)) {
-    return { maxInbound: 0, maxOutbound: 1 } // Power plants only output, 1 connection max
-  }
+  switch (true) {
+    case isPowerPlant(component):
+      return { maxInbound: 0, maxOutbound: 1 } // Power plants only output, 1 connection max
 
-  if (isCity(component)) {
-    return { maxInbound: 6, maxOutbound: 0 } // Cities only input, 6 connections max
-  }
+    case isCity(component):
+      return { maxInbound: 6, maxOutbound: 0 } // Cities only input, 6 connections max
 
-  if (isSubstation(component)) {
-    return { maxInbound: 1, maxOutbound: 1 } // Substations: 1 input, 1 output
-  }
+    case isSubstation(component):
+      return { maxInbound: 1, maxOutbound: 1 } // Substations: 1 input, 1 output
 
-  if (isSwitchingStation(component)) {
-    return { maxInbound: 4, maxOutbound: 4 } // Switching stations: 4 each direction
-  }
+    case isSwitchingStation(component):
+      return { maxInbound: 4, maxOutbound: 4 } // Switching stations: 4 each direction
 
-  if (isPylon(component)) {
-    return { maxInbound: 4, maxOutbound: 4 } // Pylons: 4 each direction
-  }
+    case isPylon(component):
+      return { maxInbound: 4, maxOutbound: 4 } // Pylons: 4 each direction
 
-  // Default fallback
-  return { maxInbound: 0, maxOutbound: 0 }
+    default:
+      // Default fallback
+      return { maxInbound: 0, maxOutbound: 0 }
+  }
 }
 
 /**
@@ -85,10 +83,16 @@ export function canAcceptConnection(
         return { allowed: false, reason: 'Substation output occupied (1/1 source used)' }
       }
       if (isSwitchingStation(component)) {
-        return { allowed: false, reason: `Switching station at capacity (${counts.outbound}/${limits.maxOutbound} sources used)` }
+        return {
+          allowed: false,
+          reason: `Switching station at capacity (${counts.outbound}/${limits.maxOutbound} sources used)`,
+        }
       }
       if (isPylon(component)) {
-        return { allowed: false, reason: `Pylon at capacity (${counts.outbound}/${limits.maxOutbound} lines connected)` }
+        return {
+          allowed: false,
+          reason: `Pylon at capacity (${counts.outbound}/${limits.maxOutbound} lines connected)`,
+        }
       }
       return { allowed: false, reason: 'Component at capacity' }
     }
@@ -103,7 +107,10 @@ export function canAcceptConnection(
         return { allowed: false, reason: 'Substation input occupied (1/1 target used)' }
       }
       if (isSwitchingStation(component)) {
-        return { allowed: false, reason: `Switching station at capacity (${counts.inbound}/${limits.maxInbound} targets used)` }
+        return {
+          allowed: false,
+          reason: `Switching station at capacity (${counts.inbound}/${limits.maxInbound} targets used)`,
+        }
       }
       if (isPylon(component)) {
         return { allowed: false, reason: `Pylon at capacity (${counts.inbound}/${limits.maxInbound} lines connected)` }
@@ -121,79 +128,227 @@ export function canAcceptConnection(
 export function getHandleAvailability(component: Component, lines: TransmissionLine[]): HandleInfo[] {
   const counts = getConnectionCounts(component.id, lines)
   const limits = getMaxConnections(component)
-  const handles: HandleInfo[] = []
 
-  if (isPowerPlant(component)) {
-    // Power plant: 4 source handles (Right, Top, Bottom, Left)
-    // All disable when 1 connection exists
+  // helper functions for each component type
+  const getPowerPlantHandles = (counts: ConnectionCounts, limits: ConnectionLimits): HandleInfo[] => {
     const enabled = counts.outbound < limits.maxOutbound
-    handles.push(
+    return [
       { id: 'source-right', position: Position.Right, type: 'source', enabled, connectionCount: counts.outbound },
       { id: 'source-top', position: Position.Top, type: 'source', enabled, connectionCount: counts.outbound },
       { id: 'source-bottom', position: Position.Bottom, type: 'source', enabled, connectionCount: counts.outbound },
-      { id: 'source-left', position: Position.Left, type: 'source', enabled, connectionCount: counts.outbound }
-    )
-  } else if (isCity(component)) {
-    // City: 6 target handles (Left, Top-Left, Top, Bottom-Left, Bottom, Left-Center)
-    // All always enabled
+      { id: 'source-left', position: Position.Left, type: 'source', enabled, connectionCount: counts.outbound },
+    ]
+  }
+  const getCityHandles = (counts: ConnectionCounts, limits: ConnectionLimits): HandleInfo[] => {
     const enabled = counts.inbound < limits.maxInbound
-    handles.push(
-      { id: 'target-left', position: Position.Left, type: 'target', enabled, connectionCount: counts.inbound },
-      { id: 'target-top', position: Position.Top, type: 'target', enabled, connectionCount: counts.inbound },
-      { id: 'target-bottom', position: Position.Bottom, type: 'target', enabled, connectionCount: counts.inbound }
-    )
-    // Add additional Left-positioned handles for 6 total
-    // React Flow will space them automatically
-    for (let i = 0; i < 3; i++) {
+    const handles: HandleInfo[] = []
+    // Add 4 Top-positioned handles  (React Flow will space them)
+    for (let i = 0; i < 4; i++) {
       handles.push({
-        id: `target-left-${i}`,
-        position: Position.Left,
+        id: `target-top-${i}`,
+        position: Position.Top,
         type: 'target',
         enabled,
         connectionCount: counts.inbound,
       })
+      // Add 4 Bottom-positioned handles  (React Flow will space them)
+      for (let i = 0; i < 4; i++) {
+        handles.push({
+          id: `target-bottom-${i}`,
+          position: Position.Bottom,
+          type: 'target',
+          enabled,
+          connectionCount: counts.inbound,
+        })
+      }
     }
-  } else if (isSubstation(component)) {
-    // Substation: 4 input handles (Left) + 4 output handles (Right)
+    return handles
+  }
+  const getSubstationHandles = (counts: ConnectionCounts, limits: ConnectionLimits): HandleInfo[] => {
     const inputEnabled = counts.inbound < limits.maxInbound
     const outputEnabled = counts.outbound < limits.maxOutbound
 
-    // Input handles (Left side)
-    handles.push(
-      { id: 'target-left-1', position: Position.Left, type: 'target', enabled: inputEnabled, connectionCount: counts.inbound },
-      { id: 'target-left-2', position: Position.Left, type: 'target', enabled: inputEnabled, connectionCount: counts.inbound },
-      { id: 'target-left-3', position: Position.Left, type: 'target', enabled: inputEnabled, connectionCount: counts.inbound },
-      { id: 'target-left-4', position: Position.Left, type: 'target', enabled: inputEnabled, connectionCount: counts.inbound }
-    )
+    return [
+      // Input handles (Left & Top side)
+      {
+        id: 'target-left-input',
+        position: Position.Left,
+        type: 'target',
+        enabled: inputEnabled,
+        connectionCount: counts.inbound,
+      },
+      {
+        id: 'target-top-input',
+        position: Position.Top,
+        type: 'target',
+        enabled: inputEnabled,
+        connectionCount: counts.inbound,
+      },
 
-    // Output handles (Right side)
-    handles.push(
-      { id: 'source-right-1', position: Position.Right, type: 'source', enabled: outputEnabled, connectionCount: counts.outbound },
-      { id: 'source-right-2', position: Position.Right, type: 'source', enabled: outputEnabled, connectionCount: counts.outbound },
-      { id: 'source-right-3', position: Position.Right, type: 'source', enabled: outputEnabled, connectionCount: counts.outbound },
-      { id: 'source-right-4', position: Position.Right, type: 'source', enabled: outputEnabled, connectionCount: counts.outbound }
-    )
-  } else if (isSwitchingStation(component) || isPylon(component)) {
-    // Switching Station / Pylon: 4 input handles + 4 output handles
+      // Output handles (Right & Bottom side)
+      {
+        id: 'source-right-output',
+        position: Position.Right,
+        type: 'source',
+        enabled: outputEnabled,
+        connectionCount: counts.outbound,
+      },
+      {
+        id: 'source-bottom-output',
+        position: Position.Bottom,
+        type: 'source',
+        enabled: outputEnabled,
+        connectionCount: counts.outbound,
+      },
+    ]
+  }
+  const getSwitchingStationHandles = (counts: ConnectionCounts, limits: ConnectionLimits): HandleInfo[] => {
     const inputEnabled = counts.inbound < limits.maxInbound
     const outputEnabled = counts.outbound < limits.maxOutbound
 
-    // Input handles (Left, Top, Bottom positions)
-    handles.push(
-      { id: 'target-left', position: Position.Left, type: 'target', enabled: inputEnabled, connectionCount: counts.inbound },
-      { id: 'target-top', position: Position.Top, type: 'target', enabled: inputEnabled, connectionCount: counts.inbound },
-      { id: 'target-bottom', position: Position.Bottom, type: 'target', enabled: inputEnabled, connectionCount: counts.inbound },
-      { id: 'target-left-2', position: Position.Left, type: 'target', enabled: inputEnabled, connectionCount: counts.inbound }
-    )
+    return [
+      // Input handles (Left, Top, Bottom positions)
+      {
+        id: 'target-left',
+        position: Position.Left,
+        type: 'target',
+        enabled: inputEnabled,
+        connectionCount: counts.inbound,
+      },
+      {
+        id: 'target-top',
+        position: Position.Top,
+        type: 'target',
+        enabled: inputEnabled,
+        connectionCount: counts.inbound,
+      },
+      {
+        id: 'target-bottom',
+        position: Position.Bottom,
+        type: 'target',
+        enabled: inputEnabled,
+        connectionCount: counts.inbound,
+      },
+      {
+        id: 'target-left-2',
+        position: Position.Left,
+        type: 'target',
+        enabled: inputEnabled,
+        connectionCount: counts.inbound,
+      },
 
-    // Output handles (Right, Top, Bottom positions)
-    handles.push(
-      { id: 'source-right', position: Position.Right, type: 'source', enabled: outputEnabled, connectionCount: counts.outbound },
-      { id: 'source-top-2', position: Position.Top, type: 'source', enabled: outputEnabled, connectionCount: counts.outbound },
-      { id: 'source-bottom-2', position: Position.Bottom, type: 'source', enabled: outputEnabled, connectionCount: counts.outbound },
-      { id: 'source-right-2', position: Position.Right, type: 'source', enabled: outputEnabled, connectionCount: counts.outbound }
-    )
+      // Output handles (Right, Top, Bottom positions)
+      {
+        id: 'source-right',
+        position: Position.Right,
+        type: 'source',
+        enabled: outputEnabled,
+        connectionCount: counts.outbound,
+      },
+      {
+        id: 'source-top-2',
+        position: Position.Top,
+        type: 'source',
+        enabled: outputEnabled,
+        connectionCount: counts.outbound,
+      },
+      {
+        id: 'source-bottom-2',
+        position: Position.Bottom,
+        type: 'source',
+        enabled: outputEnabled,
+        connectionCount: counts.outbound,
+      },
+      {
+        id: 'source-right-2',
+        position: Position.Right,
+        type: 'source',
+        enabled: outputEnabled,
+        connectionCount: counts.outbound,
+      },
+    ]
+  }
+  const getPylonHandles = (counts: ConnectionCounts, limits: ConnectionLimits): HandleInfo[] => {
+    const inputEnabled = counts.inbound < limits.maxInbound
+    const outputEnabled = counts.outbound < limits.maxOutbound
+
+    return [
+      // Input handles (Left, Top, Bottom positions)
+      {
+        id: 'target-left',
+        position: Position.Left,
+        type: 'target',
+        enabled: inputEnabled,
+        connectionCount: counts.inbound,
+      },
+      {
+        id: 'target-top',
+        position: Position.Top,
+        type: 'target',
+        enabled: inputEnabled,
+        connectionCount: counts.inbound,
+      },
+      {
+        id: 'target-bottom',
+        position: Position.Bottom,
+        type: 'target',
+        enabled: inputEnabled,
+        connectionCount: counts.inbound,
+      },
+      {
+        id: 'target-left-2',
+        position: Position.Left,
+        type: 'target',
+        enabled: inputEnabled,
+        connectionCount: counts.inbound,
+      },
+
+      // Output handles (Right, Top, Bottom positions)
+      {
+        id: 'source-right',
+        position: Position.Right,
+        type: 'source',
+        enabled: outputEnabled,
+        connectionCount: counts.outbound,
+      },
+      {
+        id: 'source-top-2',
+        position: Position.Top,
+        type: 'source',
+        enabled: outputEnabled,
+        connectionCount: counts.outbound,
+      },
+      {
+        id: 'source-bottom-2',
+        position: Position.Bottom,
+        type: 'source',
+        enabled: outputEnabled,
+        connectionCount: counts.outbound,
+      },
+      {
+        id: 'source-right-2',
+        position: Position.Right,
+        type: 'source',
+        enabled: outputEnabled,
+        connectionCount: counts.outbound,
+      },
+    ]
   }
 
-  return handles
+  // use a switch on boolean checks to select the component handler
+  switch (true) {
+    case isPowerPlant(component):
+      return getPowerPlantHandles(counts, limits)
+    case isCity(component):
+      return getCityHandles(counts, limits)
+    case isSubstation(component):
+      return getSubstationHandles(counts, limits)
+    case isSwitchingStation(component):
+      return getSwitchingStationHandles(counts, limits)
+    case isPylon(component):
+      return getPylonHandles(counts, limits)
+    default:
+      // no specific handles for unknown component types
+      return []
+  }
 }

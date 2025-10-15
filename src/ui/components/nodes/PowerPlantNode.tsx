@@ -26,7 +26,7 @@ export const PowerPlantNode = memo(({ data }: NodeProps<PowerPlantNodeData>) => 
           type={handle.type}
           position={handle.position}
           isConnectable={handle.enabled}
-          className={handle.enabled ? 'handle-enabled' : 'handle-disabled'}
+          className={`${handle.enabled ? 'handle-enabled' : 'handle-disabled'} ${handle.type === 'source' ? 'handle-source' : 'handle-target'}`}
         />
       ))}
       <div className="node-icon" style={{ backgroundColor: plantColor }}>
