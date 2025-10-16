@@ -23,10 +23,11 @@ export const SubstationNode = memo(({ data }: NodeProps<SubstationNodeData>) => 
       {handles.map(handle => (
         <Handle
           key={handle.id}
+          id={handle.id}
           type={handle.type}
           position={handle.position}
           isConnectable={handle.enabled}
-          className={handle.enabled ? 'handle-enabled' : 'handle-disabled'}
+          className={`react-flow__handle ${handle.enabled ? 'handle-enabled' : 'handle-disabled'} ${handle.type === 'source' ? 'source' : 'target'}`}
         />
       ))}
       <div

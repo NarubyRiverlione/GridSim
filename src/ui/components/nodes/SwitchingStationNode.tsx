@@ -23,6 +23,7 @@ export const SwitchingStationNode = memo(({ data }: NodeProps<SwitchingStationNo
       {handles.map(handle => (
         <Handle
           key={handle.id}
+          id={handle.id}
           type={handle.type}
           position={handle.position}
           isConnectable={handle.enabled}

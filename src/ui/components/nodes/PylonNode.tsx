@@ -24,6 +24,7 @@ export const PylonNode = memo(({ data }: NodeProps<PylonNodeData>): React.ReactE
       {handles.map(handle => (
         <Handle
           key={handle.id}
+          id={handle.id}
           type={handle.type}
           position={handle.position}
           isConnectable={handle.enabled}

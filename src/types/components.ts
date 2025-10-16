@@ -32,6 +32,8 @@ export interface TransmissionLine {
   id: string
   from: NodeId
   to: NodeId
+  sourceHandle: string
+  targetHandle: string
   path: Point[]
   voltage: VoltageLevel
   capacity: number

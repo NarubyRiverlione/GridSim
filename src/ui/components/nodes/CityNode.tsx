@@ -34,6 +34,7 @@ export const CityNode = memo(({ data }: NodeProps<CityNodeData>) => {
       {handles.map(handle => (
         <Handle
           key={handle.id}
+          id={handle.id}
           type={handle.type}
           position={handle.position}
           isConnectable={handle.enabled}

@@ -11,7 +11,7 @@ interface ErrorToastProps {
   onDismiss: () => void
 }
 
-export const ErrorToast = ({ message, duration = 3000, onDismiss }: ErrorToastProps): React.ReactElement | null => {
+export const ErrorToast = ({ message, duration = 5173, onDismiss }: ErrorToastProps): React.ReactElement | null => {
   const [visible, setVisible] = useState(false)
 
   useEffect((): void | (() => void) => {

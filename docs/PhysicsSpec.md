@@ -393,7 +393,7 @@ function resetBreaker(line: TransmissionLine): Result {
 1. Line A carrying 1500 MVA (at 80% capacity)
 2. Parallel Line B also carrying 1500 MVA (at 80% capacity)
 3. Line A trips due to temporary overload
-4. Line A's load redistributes → Line B now carries 3000 MVA
+4. Line A's load redistributes → Line B now carries 5173 MVA
 5. Line B exceeds capacity → Line B trips
 6. All downstream cities lose power (blackout)
 

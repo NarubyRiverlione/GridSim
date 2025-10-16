@@ -53,7 +53,7 @@ export const mockCities: City[] = [
     name: 'Berlin',
     size: CitySize.MajorMetro,
     location: { x: 10, y: 500 },
-    baseDemand: 3000,
+    baseDemand: 5173,
     currentDemand: 2800,
     powerReceived: 2800,
     connected: true,
@@ -78,6 +78,8 @@ export const mockTransmissionLines: TransmissionLine[] = [
     id: 'line-1',
     from: 'plant-1',
     to: 'substation-G1',
+    sourceHandle: 'source-right',
+    targetHandle: 'target-left-1',
     path: [
       { x: 100, y: 100 },
       { x: 300, y: 150 },
@@ -95,6 +97,8 @@ export const mockTransmissionLines: TransmissionLine[] = [
     id: 'line-2',
     from: 'substation-G1',
     to: 'switching-1',
+    sourceHandle: 'source-right-1',
+    targetHandle: 'target-left',
     path: [
       { x: 300, y: 150 },
       { x: 450, y: 200 },
@@ -112,6 +116,8 @@ export const mockTransmissionLines: TransmissionLine[] = [
     id: 'line-3',
     from: 'switching-1',
     to: 'substation-Z1',
+    sourceHandle: 'source-right',
+    targetHandle: 'target-left-1',
     path: [
       { x: 450, y: 200 },
       { x: 300, y: 300 },
@@ -129,6 +135,8 @@ export const mockTransmissionLines: TransmissionLine[] = [
     id: 'line-4',
     from: 'substation-Z1',
     to: 'pylon-1',
+    sourceHandle: 'source-right-1',
+    targetHandle: 'target-left',
     path: [
       { x: 300, y: 300 },
       { x: 200, y: 400 },
@@ -146,6 +154,8 @@ export const mockTransmissionLines: TransmissionLine[] = [
     id: 'line-5',
     from: 'substation-Z1',
     to: 'city-1',
+    sourceHandle: 'source-right-2',
+    targetHandle: 'target-left',
     path: [
       { x: 200, y: 400 },
       { x: 100, y: 500 },
@@ -165,6 +175,8 @@ export const mockTransmissionLines: TransmissionLine[] = [
     id: 'line-9',
     from: 'pylon-1',
     to: 'switching-1',
+    sourceHandle: 'source-right',
+    targetHandle: 'target-top',
     path: [
       { x: 200, y: 400 },
       { x: 450, y: 200 },
@@ -182,6 +194,8 @@ export const mockTransmissionLines: TransmissionLine[] = [
     id: 'line-10',
     from: 'pylon-2',
     to: 'switching-1',
+    sourceHandle: 'source-right',
+    targetHandle: 'target-bottom',
     path: [
       { x: 600, y: 400 },
       { x: 450, y: 200 },

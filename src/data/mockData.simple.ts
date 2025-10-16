@@ -53,6 +53,8 @@ export const mockTransmissionLines: TransmissionLine[] = [
     id: 'line-1',
     from: 'plant-1',
     to: 'substation-G1',
+    sourceHandle: 'source-right',
+    targetHandle: 'target-left-1',
     path: [
       { x: 200, y: 150 },
       { x: 200, y: 300 },
@@ -70,6 +72,8 @@ export const mockTransmissionLines: TransmissionLine[] = [
     id: 'line-2',
     from: 'substation-G1',
     to: 'switch-1',
+    sourceHandle: 'source-right-1',
+    targetHandle: 'target-left',
     path: [
       { x: 200, y: 300 },
       { x: 200, y: 450 },
@@ -87,6 +91,8 @@ export const mockTransmissionLines: TransmissionLine[] = [
     id: 'line-3',
     from: 'switch-1',
     to: 'substation-Z1',
+    sourceHandle: 'source-right',
+    targetHandle: 'target-left-1',
     path: [
       { x: 200, y: 300 },
       { x: 200, y: 450 },
@@ -104,6 +110,8 @@ export const mockTransmissionLines: TransmissionLine[] = [
     id: 'line-4',
     from: 'substation-Z1',
     to: 'pylon-1',
+    sourceHandle: 'source-right-1',
+    targetHandle: 'target-left',
     path: [
       { x: 200, y: 450 },
       { x: 200, y: 600 },
@@ -121,6 +129,8 @@ export const mockTransmissionLines: TransmissionLine[] = [
     id: 'line-5',
     from: 'pylon-1',
     to: 'pylon-2',
+    sourceHandle: 'source-right',
+    targetHandle: 'target-left',
     path: [
       { x: 200, y: 450 },
       { x: 200, y: 600 },
@@ -138,6 +148,8 @@ export const mockTransmissionLines: TransmissionLine[] = [
     id: 'line-6',
     from: 'pylon-2',
     to: 'city-1',
+    sourceHandle: 'source-right',
+    targetHandle: 'target-left',
     path: [
       { x: 200, y: 450 },
       { x: 200, y: 600 },

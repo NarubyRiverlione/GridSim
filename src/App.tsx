@@ -100,16 +100,25 @@ export const App = (): React.ReactElement => {
   }
 
   // Handler for adding new transmission lines
-  const handleLineAdd = (source: Component, target: Component): void => {
+  const handleLineAdd = (sourceId: string, targetId: string, sourceHandle: string, targetHandle: string): void => {
+    // Find the source and target components
+    const source = allComponents.find(c => c.id === sourceId)
+    const target = allComponents.find(c => c.id === targetId)
+
+    if (!source || !target) {
+      setErrorMessage('Invalid connection: component not found')
+      return
+    }
+
     // Check if connection is valid
     const validation = linePlacement.canConnectNodes(source, target)
 
     if (!validation.valid) {
-      // Error is already set in lineDrawingState by handleNodeClickForLine
+      setErrorMessage(validation.error ?? 'Invalid connection')
       return
     }
 
-    const newLine = createTransmissionLine(source, target)
+    const newLine = createTransmissionLine(source, target, sourceHandle, targetHandle)
     setTransmissionLines([...transmissionLines, newLine])
   }
 

@@ -6,12 +6,13 @@ import React, { useCallback, useMemo, useRef, useEffect } from 'react'
 import ReactFlow, {
   Background,
   Controls,
-  MiniMap,
   type Node,
   type Edge,
+  type Connection,
   useNodesState,
   useEdgesState,
   useReactFlow,
+  ConnectionMode,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 
@@ -50,7 +51,7 @@ interface GridCanvasProps {
   lineDrawingState: LineDrawingState
   onNodeClickForLine: (node: Component) => void
   onMouseMoveForLine: (x: number, y: number) => void
-  onLineAdd: (source: Component, target: Component) => void
+  onLineAdd: (sourceId: string, targetId: string, sourceHandle: string, targetHandle: string) => void
   onNodeDragStop?: (id: string, x: number, y: number) => void
   onPlacementBlocked?: (message: string) => void
   placementBuffer?: number
@@ -66,8 +67,6 @@ export const GridCanvas = ({
   onMouseMove,
   onPlacementClick,
   onComponentAdd,
-  lineDrawingState,
-  onNodeClickForLine,
   onMouseMoveForLine,
   onLineAdd,
   onNodeDragStop,
@@ -157,7 +156,7 @@ export const GridCanvas = ({
     [onComponentSelect]
   )
 
-  // Handle node selection or line drawing
+  // Handle node selection
   const handleNodeClick = useCallback(
     (_event: React.MouseEvent, node: Node): void => {
       if (node.id === GHOST_NODE_ID) return
@@ -182,23 +181,10 @@ export const GridCanvas = ({
         return
       }
 
-      // If in line drawing mode, handle line placement
-      if (mode === InteractionMode.AddTransmissionLine) {
-        // If completing a line (second click), create it first
-        if (lineDrawingState.isDrawing && lineDrawingState.sourceNode !== null) {
-          onLineAdd(lineDrawingState.sourceNode, component)
-        }
-
-        // Then update the line drawing state
-        onNodeClickForLine(component)
-      }
       // Click no longer selects in select mode - hover does that
     },
     [
       mode,
-      onNodeClickForLine,
-      lineDrawingState,
-      onLineAdd,
       placementConfig,
       onPlacementClick,
       onComponentAdd,
@@ -206,6 +192,18 @@ export const GridCanvas = ({
       onPlacementBlocked,
       placementBuffer,
     ]
+  )
+
+  // Handle connection creation via React Flow's native connection system
+  const handleConnect = useCallback(
+    (connection: Connection): void => {
+      if (mode !== InteractionMode.AddTransmissionLine) return
+      if (!connection.source || !connection.target) return
+      if (!connection.sourceHandle || !connection.targetHandle) return
+
+      onLineAdd(connection.source, connection.target, connection.sourceHandle, connection.targetHandle)
+    },
+    [mode, onLineAdd]
   )
 
   // Handle edge hover - show line details
@@ -305,6 +303,8 @@ export const GridCanvas = ({
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
+        onConnect={handleConnect}
+        connectionMode={ConnectionMode.Loose}
         onNodeDrag={(_event, node) => {
           if (node.id === GHOST_NODE_ID) return
           const pos = node.position as { x?: number; y?: number } | undefined

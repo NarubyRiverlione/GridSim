@@ -23,6 +23,7 @@ export const PowerPlantNode = memo(({ data }: NodeProps<PowerPlantNodeData>) => 
       {handles.map(handle => (
         <Handle
           key={handle.id}
+          id={handle.id}
           type={handle.type}
           position={handle.position}
           isConnectable={handle.enabled}

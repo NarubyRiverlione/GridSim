@@ -58,7 +58,7 @@ export const mockCities: City[] = [
     name: 'Berlin',
     size: CitySize.MajorMetro,
     location: { x: 600, y: 300 },
-    baseDemand: 3000,
+    baseDemand: 5173,
     currentDemand: 2800,
     powerReceived: 2800,
     connected: true,
@@ -93,6 +93,8 @@ export const mockTransmissionLines: TransmissionLine[] = [
     id: 'line-1',
     from: 'plant-1',
     to: 'substation-1',
+    sourceHandle: 'source-right',
+    targetHandle: 'target-left-1',
     path: [
       { x: 100, y: 200 },
       { x: 300, y: 250 },
@@ -110,6 +112,8 @@ export const mockTransmissionLines: TransmissionLine[] = [
     id: 'line-2',
     from: 'plant-2',
     to: 'city-2',
+    sourceHandle: 'source-right',
+    targetHandle: 'target-left',
     path: [
       { x: 400, y: 150 },
       { x: 500, y: 100 },
@@ -127,6 +131,8 @@ export const mockTransmissionLines: TransmissionLine[] = [
     id: 'line-3',
     from: 'substation-1',
     to: 'city-1',
+    sourceHandle: 'source-right-1',
+    targetHandle: 'target-left',
     path: [
       { x: 300, y: 250 },
       { x: 600, y: 300 },

@@ -71,7 +71,12 @@ export const calculateDistance = (source: Point, target: Point): number => {
 /**
  * Create a new transmission line between two components
  */
-export const createTransmissionLine = (source: Component, target: Component): TransmissionLine => {
+export const createTransmissionLine = (
+  source: Component,
+  target: Component,
+  sourceHandle: string,
+  targetHandle: string
+): TransmissionLine => {
   const id = `line-${lineIdCounter++}`
 
   // Determine voltage based on endpoints
@@ -87,6 +92,8 @@ export const createTransmissionLine = (source: Component, target: Component): Tr
     id,
     from: source.id,
     to: target.id,
+    sourceHandle,
+    targetHandle,
     path: [source.location, target.location],
     voltage,
     capacity,

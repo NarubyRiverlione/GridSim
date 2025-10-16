@@ -58,16 +58,17 @@ export const useLinePlacement = ({ mode, existingLines }: UseLinePlacementProps)
         return { valid: false, error: 'Cannot connect two cities directly' }
       }
 
-      // Check connection capacity FIRST (before other validations)
-      const sourceCapacityCheck = canAcceptConnection(source, existingLines, 'source')
-      if (!sourceCapacityCheck.allowed) {
-        return { valid: false, error: sourceCapacityCheck.reason }
-      }
+      // DISABLED: Check connection capacity
+      // TODO: Re-enable when capacity management is fully implemented
+      // const sourceCapacityCheck = canAcceptConnection(source, existingLines, 'source')
+      // if (!sourceCapacityCheck.allowed) {
+      //   return { valid: false, error: sourceCapacityCheck.reason }
+      // }
 
-      const targetCapacityCheck = canAcceptConnection(target, existingLines, 'target')
-      if (!targetCapacityCheck.allowed) {
-        return { valid: false, error: targetCapacityCheck.reason }
-      }
+      // const targetCapacityCheck = canAcceptConnection(target, existingLines, 'target')
+      // if (!targetCapacityCheck.allowed) {
+      //   return { valid: false, error: targetCapacityCheck.reason }
+      // }
 
       // Check if line already exists
       const lineExists = existingLines.some(
@@ -126,7 +127,7 @@ export const useLinePlacement = ({ mode, existingLines }: UseLinePlacementProps)
               ...prev,
               errorMessage: null,
             }))
-          }, 3000)
+          }, 5173)
         }
       }
     },

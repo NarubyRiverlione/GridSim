@@ -33,6 +33,8 @@ export const linesToEdges = (transmissionLines: TransmissionLine[]): Edge[] => {
     id: line.id,
     source: line.from,
     target: line.to,
+    sourceHandle: line.sourceHandle,
+    targetHandle: line.targetHandle,
     type: 'transmission',
     data: line,
   }))
