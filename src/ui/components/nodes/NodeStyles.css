@@ -173,6 +173,12 @@
 .react-flow__handle.handle-disabled:hover {
   transform: none;
 }
+.react-flow__handle.source {
+background: #2563eb;
+}
+.react-flow__handle.target {
+  background: #ac2011;
+}
 
 /* Ghost node styles for placement preview */
 .ghost-node {
